@@ -1,7 +1,7 @@
-from functools import update_wrapper
+import time
+from collections import deque
 
-
-"""Данная библиотека содержит декораторы, предназначеннные для получения статистки работы функции"""
+"""Данная библиотека содержит декоратор, предназначеннный для получения статистки работы функции"""
 
 
 class StatisticItem:
@@ -20,14 +20,25 @@ class Statistic:
 
     count = StatisticItem()
     func = StatisticItem()
+    avg_time = StatisticItem()
 
     def __init__(self, func):
         self.func = func
         self.count = 0
+        self.avg_time = deque()
+        self.work_start = time.time()
+        self.work_finish = None
 
     def __call__(self, *args, **kwargs):
         self.count += 1
-        return self.func(*args, **kwargs)
+
+        work_start = time.time()
+        func_result = self.func(*args, **kwargs)
+        self.work_finish = time.time()
+
+        self.avg_time.append(self.work_finish - work_start)
+
+        return func_result
 
     def get_name(self):
         return self.func.__name__
@@ -35,9 +46,16 @@ class Statistic:
     def get_count(self):
         return self.count
 
+    def get_avg_time(self):
+        return sum(self.avg_time) / len(self.avg_time)
+
+    def get_avg_time_per_minute(self):
+        return self.get_count() / (self.work_finish - self.work_start)
+
     def get_statistic(self):
         """Возвращает кортеж, содержащий: Имя функции, Кол-во выполнений,
         Среднее время работы, а также Среднее кол-во выполнений функции в минуту"""
 
-        return self.get_name(), self.get_count()
+        return self.get_name(), self.get_count(), self.get_avg_time(), self.get_avg_time_per_minute()
+
 
