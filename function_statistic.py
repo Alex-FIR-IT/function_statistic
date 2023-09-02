@@ -34,6 +34,12 @@ class Statistic:
         self.is_on = False
 
     def __call__(self, *args, **kwargs):
+        if self.is_on:
+            return self.__is_on_call(args, kwargs)
+
+        return self.func
+
+    def __is_on_call(self, *args, **kwargs):
         self.count += 1
 
         work_start = time()
@@ -43,6 +49,7 @@ class Statistic:
         self.avg_time.append(self.work_finish - work_start)
 
         return func_result
+
 
     def get_name(self) -> str:
         """Возвращает имя функции"""
