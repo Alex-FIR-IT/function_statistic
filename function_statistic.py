@@ -89,6 +89,6 @@ class Statistic:
 
     @classmethod
     def get_all_instances_metrics(cls) -> tuple:
-        """Возвращает кортеж, содержащий значения get_all_metrics для всех экземплятов класса"""
+        """Возвращает кортеж, содержащий значения get_all_metrics для всех экземпляров класса"""
 
         return tuple(instance.get_all_metrics() for instance in cls.instances if instance.get_count())
