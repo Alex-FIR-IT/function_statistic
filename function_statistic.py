@@ -86,3 +86,9 @@ class Statistic:
         Среднее время работы функции, а также Среднее кол-во выполнений функции в минуту"""
 
         return self.get_name(), self.get_count(), self.get_avg_time(), self.get_avg_time_per_minute()
+
+    @classmethod
+    def get_all_instances_metrics(cls):
+        """Возвращает кортеж, содержащий значения get_all_metrics для всех экземплятов класса"""
+
+        return tuple(instance.get_all_metrics() for instance in cls.instances)
