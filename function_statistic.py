@@ -18,11 +18,19 @@ class StatisticItem:
 
 class Statistic:
 
+    instances = []
+
     count = StatisticItem()
     func = StatisticItem()
     avg_time = StatisticItem()
     work_start = StatisticItem()
     work_finish = StatisticItem()
+
+    def __new__(cls, *args, **kwargs):
+        instance = object.__new__(cls)
+        cls.instances.append(instance)
+
+        return instance
 
     def __init__(self, func):
         self.func = func
