@@ -1,4 +1,4 @@
-import time
+from time import time
 from collections import deque
 
 """Данная библиотека содержит декоратор, предназначеннный для получения статистки работы функции"""
@@ -26,15 +26,15 @@ class Statistic:
         self.func = func
         self.count = 0
         self.avg_time = deque()
-        self.work_start = time.time()
+        self.work_start = time()
         self.work_finish = None
 
     def __call__(self, *args, **kwargs):
         self.count += 1
 
-        work_start = time.time()
+        work_start = time()
         func_result = self.func(*args, **kwargs)
-        self.work_finish = time.time()
+        self.work_finish = time()
 
         self.avg_time.append(self.work_finish - work_start)
 
