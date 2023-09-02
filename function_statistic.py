@@ -68,7 +68,7 @@ class Statistic:
         if count:
             return round(sum(self.avg_time) / count, 18)
 
-        raise ZeroDivisionError("Невозможно вычислить среднее время работы функции, т.к она ни разу не вызывалась")
+        raise ZeroDivisionError(f"Невозможно вычислить среднее время работы функции {self.get_name()}, т.к она ни разу не вызывалась")
 
     def get_avg_time_per_minute(self) -> float:
         """Возвращает среднее количество выполнений функции в минуту"""
@@ -78,7 +78,7 @@ class Statistic:
         if work_finish:
             return round(60 * self.count / (self.work_finish - self.work_start), 1)
 
-        raise ArithmeticError("Невозможно вычислить среднее время работы функции в минуту, "
+        raise ArithmeticError(f"Невозможно вычислить среднее время работы функции {self.get_name()} в минуту, "
                               "т.к она ни разу не вызывалась")
 
     def get_all_metrics(self) -> tuple:
@@ -91,4 +91,4 @@ class Statistic:
     def get_all_instances_metrics(cls) -> tuple:
         """Возвращает кортеж, содержащий значения get_all_metrics для всех экземплятов класса"""
 
-        return tuple(instance.get_all_metrics() for instance in cls.instances)
+        return tuple(instance.get_all_metrics() for instance in cls.instances if instance.get_count())
