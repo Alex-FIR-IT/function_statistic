@@ -66,7 +66,7 @@ class Statistic:
         count = self.get_count()
 
         if count:
-            return sum(self.avg_time) / count
+            return round(sum(self.avg_time) / count, 18)
 
         raise ZeroDivisionError("Невозможно вычислить среднее время работы функции, т.к она ни разу не вызывалась")
 
