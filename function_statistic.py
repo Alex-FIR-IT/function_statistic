@@ -21,6 +21,8 @@ class Statistic:
     count = StatisticItem()
     func = StatisticItem()
     avg_time = StatisticItem()
+    work_start = StatisticItem()
+    work_finish = StatisticItem()
 
     def __init__(self, func):
         self.func = func
