@@ -68,7 +68,7 @@ class Statistic:
         work_finish = self.work_finish
 
         if work_finish:
-            return 60 * self.count / (self.work_finish - self.work_start)
+            return round(60 * self.count / (self.work_finish - self.work_start), 1)
 
         raise ArithmeticError("Невозможно вычислить среднее время работы функции в минуту, "
                               "т.к она ни разу не вызывалась")
