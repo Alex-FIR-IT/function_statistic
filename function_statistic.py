@@ -23,6 +23,7 @@ class Statistic:
     avg_time = StatisticItem()
     work_start = StatisticItem()
     work_finish = StatisticItem()
+    is_on = StatisticItem()
 
     def __init__(self, func):
         self.func = func
@@ -30,6 +31,7 @@ class Statistic:
         self.avg_time = deque()
         self.work_start = time()
         self.work_finish = None
+        self.is_on = False
 
     def __call__(self, *args, **kwargs):
         self.count += 1
