@@ -1,7 +1,7 @@
 from time import time
 from collections import deque
 
-"""Данная библиотека содержит декоратор, предназначеннный для получения статистки работы функции"""
+"""Данная библиотека содержит декоратор, предназначеннный для получения статистики работы декорированной функции"""
 
 
 class StatisticItem:
@@ -9,11 +9,11 @@ class StatisticItem:
     def __set_name__(self, owner, name):
         self.__name = f"_{owner.__name__}__{name}"
 
-    def __set__(self, instance, value):
-        setattr(instance, self.__name, value)
-
     def __get__(self, instance, owner):
         return getattr(instance, self.__name)
+
+    def __set__(self, instance, value):
+        setattr(instance, self.__name, value)
 
 
 class Statistic:
@@ -58,7 +58,7 @@ class Statistic:
         if count:
             return sum(self.avg_time) / count
 
-        raise ZeroDivisionError("Невозвомжно вычислить среднее время работы функции, т.к она ни разу не вызывалась")
+        raise ZeroDivisionError("Невозможно вычислить среднее время работы функции, т.к она ни разу не вызывалась")
 
     def get_avg_time_per_minute(self) -> float:
         """Возвращает среднее количество выполнений функции в минуту"""
@@ -68,12 +68,11 @@ class Statistic:
         if work_finish:
             return round(60 * self.count / (self.work_finish - self.work_start), 4)
 
-        raise ArithmeticError("Невозвомжно вычислить среднее время работы функции в минуту, т.к она ни разу не вызывалась")
+        raise ArithmeticError("Невозможно вычислить среднее время работы функции в минуту, "
+                              "т.к она ни разу не вызывалась")
 
-    def get_statistic(self) -> tuple:
+    def get_all_metrics(self) -> tuple:
         """Возвращает кортеж, содержащий: Имя функции, Кол-во выполнений,
         Среднее время работы, а также Среднее кол-во выполнений функции в минуту"""
 
         return self.get_name(), self.get_count(), self.get_avg_time(), self.get_avg_time_per_minute()
-
-
