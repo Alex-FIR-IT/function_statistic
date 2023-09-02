@@ -40,19 +40,37 @@ class Statistic:
 
         return func_result
 
-    def get_name(self):
+    def get_name(self) -> str:
+        """Возвращает имя функции"""
+
         return self.func.__name__
 
-    def get_count(self):
+    def get_count(self) -> int:
+        """Возвращает кол-во вызовов функции"""
+
         return self.count
 
-    def get_avg_time(self):
-        return sum(self.avg_time) / len(self.avg_time)
+    def get_avg_time(self) -> float:
+        """Возвращает среднее время выполнения функции (в секундах)"""
 
-    def get_avg_time_per_minute(self):
-        return self.get_count() / (self.work_finish - self.work_start)
+        count = self.get_count()
 
-    def get_statistic(self):
+        if count:
+            return sum(self.avg_time) / count
+
+        raise ZeroDivisionError("Невозвомжно вычислить среднее время работы функции, т.к она ни разу не вызывалась")
+
+    def get_avg_time_per_minute(self) -> float:
+        """Возвращает среднее количество выполнений функции в минуту"""
+
+        work_finish = self.work_finish
+
+        if work_finish:
+            return round(60 * self.count / (self.work_finish - self.work_start), 4)
+
+        raise ArithmeticError("Невозвомжно вычислить среднее время работы функции в минуту, т.к она ни разу не вызывалась")
+
+    def get_statistic(self) -> tuple:
         """Возвращает кортеж, содержащий: Имя функции, Кол-во выполнений,
         Среднее время работы, а также Среднее кол-во выполнений функции в минуту"""
 
