@@ -34,8 +34,7 @@ class Statistic:
 
     def __init__(self, func):
         self.func = func
-        self.count = 0
-        self.avg_time = deque()
+        self.count = self.avg_time = 0
         self.work_start = time()
         self.work_finish = None
 
@@ -46,7 +45,7 @@ class Statistic:
         func_result = self.func(*args, **kwargs)
         self.work_finish = time()
 
-        self.avg_time.append(self.work_finish - work_start)
+        self.avg_time = (self.work_finish - work_start) / self.count
 
         return func_result
 
@@ -66,7 +65,7 @@ class Statistic:
         count = self.get_count()
 
         if count:
-            return round(sum(self.avg_time) / count, 18)
+            return round(self.avg_time, 18)
 
         raise ZeroDivisionError(f"Невозможно вычислить среднее время работы функции {self.get_name()}, т.к она ни разу не вызывалась")
 
