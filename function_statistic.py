@@ -90,4 +90,4 @@ class Statistic:
     def get_all_instances_metrics(cls) -> tuple:
         """Возвращает кортеж, содержащий значения get_all_metrics для всех экземпляров класса"""
 
-        return tuple(instance.get_all_metrics() for instance in cls.instances if instance.get_count())
+        return tuple(instance.get_all_metrics() for instance in filter(cls.get_count, cls.instances))
