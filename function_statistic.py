@@ -91,3 +91,18 @@ class Statistic:
         """Возвращает кортеж, содержащий значения get_all_metrics для всех экземпляров класса"""
 
         return tuple(instance.get_all_metrics() for instance in filter(cls.get_count, cls.instances))
+
+    @classmethod
+    def get_average_instances_metrics(cls):
+        """Возврщает среднюю статистику по всех функциям, а именно:
+         Общее количество вызванных уникальных функций, Общее количество вызовов функций,
+         Среднеее время работ всех функций, Среднее время кол-во выполнений всех функций в минуту"""
+
+        instances = tuple(filter(cls.get_count, cls.instances))
+
+        func_amount = len(instances)
+        count_sum = sum(x.get_count() for x in instances)
+        avg_time_all_instances = sum(map(cls.get_avg_time, instances)) / func_amount
+        avg_time_per_minute__all_instances = sum(map(cls.get_avg_time_per_minute, instances)) / func_amount
+
+        return func_amount, count_sum, avg_time_all_instances, round(avg_time_per_minute__all_instances, 1)
