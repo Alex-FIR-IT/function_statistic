@@ -18,11 +18,11 @@ class StatisticItem:
 class Statistic:
 
     instances = []
-    _time_units = {"minutes":  1/60, "seconds": 1}
-    _active_time_unit = "minutes"
+    _time_units = {"microsecond": 1_000_000, "second": 1, "minute":  1/60, "hour": 1/3600}
+    _active_time_unit = "second"
 
     @classmethod
-    def set_time_unit_format(cls, time_unit='minutes'):
+    def set_time_unit_format(cls, time_unit: str = 'minute'):
         cls._active_time_unit = cls._is_in_time_units(time_unit)
 
     @classmethod
@@ -32,7 +32,8 @@ class Statistic:
     @classmethod
     def _is_in_time_units(cls, time_format):
         if time_format not in cls._time_units:
-            message = f"Такого формата нет, доступные форматы: {', '.join(x for x in cls._time_units.keys())}"
+            message = f"Введенного вами формата не существует, " \
+                      f"доступные форматы: {', '.join(x for x in cls._time_units.keys())}"
             raise KeyError(message)
 
         return time_format
@@ -89,9 +90,6 @@ class Statistic:
         if count:
             return round(self.avg_time * time_format, 18)
 
-        raise ArithmeticError(f"Невозможно вычислить среднее время работы функции {self.get_name()},"
-                              " т.к она ни разу не вызывалась")
-
     def get_avg_time_per_unit_time(self) -> float:
         """Возвращает среднее количество выполнений функции в единицу времени"""
 
@@ -101,9 +99,6 @@ class Statistic:
         if work_finish:
             return round(self.count / ((self.work_finish - self.work_start) * time_format), 1)
 
-        raise ArithmeticError(f"Невозможно вычислить среднее время работы функции {self.get_name()} в минуту, "
-                              "т.к она ни разу не вызывалась")
-
     def get_all_metrics(self) -> tuple:
         """Возвращает кортеж, содержащий: Имя функции, Кол-во вызовов функции,
         Среднее время работы функции, а также Среднее кол-во выполнений функции в минуту"""
@@ -111,21 +106,28 @@ class Statistic:
         return self.get_name(), self.get_count(), self.get_avg_time(), self.get_avg_time_per_unit_time()
 
     @classmethod
-    def get_all_instances_metrics(cls) -> tuple:
+    def get_all_instances_metrics(cls) -> tuple | None:
         """Возвращает кортеж, содержащий значения get_all_metrics для всех экземпляров класса"""
 
-        return tuple(instance.get_all_metrics() for instance in filter(cls.get_count, cls.instances))
+        all_instances_metrics = tuple(instance.get_all_metrics() for instance in filter(cls.get_count, cls.instances))
+        return all_instances_metrics if all_instances_metrics else None
 
     @classmethod
-    def get_average_instances_metrics(cls):
+    def get_average_instances_metrics(cls) -> tuple:
         """Возвращает среднюю статистику по всем функциям, а именно:
-         Общее количество вызванных уникальных функций, Общее количество вызовов функций,
-         Среднее время работы всех функций, Среднее время кол-во выполнений всех функций в минуту"""
+         Общее количество вызванных уникальных функций,
+         Общее количество вызовов функций,
+         Среднее время работы всех функций,
+         Среднее время кол-во выполнений всех функций в минуту"""
 
         instances = tuple(filter(cls.get_count, cls.instances))
 
         func_amount = len(instances)
         count_sum = sum(x.get_count() for x in instances)
+
+        if not func_amount:
+            return func_amount, count_sum, None, None
+
         avg_time_all_instances = sum(map(cls.get_avg_time, instances)) / func_amount
         avg_time_per_minute__all_instances = sum(map(cls.get_avg_time_per_unit_time, instances)) / func_amount
 
