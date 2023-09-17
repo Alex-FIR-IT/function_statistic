@@ -22,15 +22,15 @@ class Statistic:
     _active_time_unit = "second"
 
     @classmethod
-    def set_time_unit_format(cls, time_unit: str = 'minute'):
+    def set_time_unit_format(cls, time_unit: str = 'minute') -> None:
         cls._active_time_unit = cls._is_in_time_units(time_unit)
 
     @classmethod
-    def get_time_unit_format(cls):
+    def get_time_unit_format(cls) -> str:
         return cls._active_time_unit
 
     @classmethod
-    def _is_in_time_units(cls, time_format):
+    def _is_in_time_units(cls, time_format: str) -> str:
         if time_format not in cls._time_units:
             message = f"Введенного вами формата не существует, " \
                       f"доступные форматы: {', '.join(x for x in cls._time_units.keys())}"
@@ -39,7 +39,7 @@ class Statistic:
         return time_format
 
     @classmethod
-    def _get_time_unit_value(cls):
+    def _get_time_unit_value(cls) -> int | float:
         return cls._time_units.get(cls.get_time_unit_format())
 
     count = StatisticItem()
@@ -82,7 +82,7 @@ class Statistic:
         return self.count
 
     def get_avg_time(self) -> float | None:
-        """Возвращает среднее время выполнения функции (в секундах)"""
+        """Возвращает среднее время выполнения функции (дефолт: в секундах)"""
 
         count = self.get_count()
         time_format = self._get_time_unit_value()
@@ -91,7 +91,7 @@ class Statistic:
             return round(self.avg_time * time_format, 18)
 
     def get_avg_time_per_unit_time(self) -> float | None:
-        """Возвращает среднее количество выполнений функции в единицу времени"""
+        """Возвращает среднее количество выполнений функции в единицу времени (дефолт: в секунду)"""
 
         work_finish = self.work_finish
         time_format = self._get_time_unit_value()
@@ -100,8 +100,11 @@ class Statistic:
             return round(self.count / ((self.work_finish - self.work_start) * time_format), 1)
 
     def get_all_metrics(self) -> tuple[str, int, float | None, float | None]:
-        """Возвращает кортеж, содержащий: Имя функции, Кол-во вызовов функции,
-        Среднее время работы функции, а также Среднее кол-во выполнений функции в минуту"""
+        """Возвращает кортеж, содержащий:
+        Имя функции,
+        Кол-во вызовов функции,
+        Среднее время работы функции,
+        Среднее кол-во выполнений функции в единицу времени (дефолт: в секундах)"""
 
         return self.get_name(), self.get_count(), self.get_avg_time(), self.get_avg_time_per_unit_time()
 
@@ -118,7 +121,7 @@ class Statistic:
          Общее количество вызванных уникальных функций,
          Общее количество вызовов функций,
          Среднее время работы всех функций,
-         Среднее время кол-во выполнений всех функций в минуту"""
+         Среднее время кол-во выполнений всех функций в единицу времени (дефолт: в секунду)"""
 
         instances = tuple(filter(cls.get_count, cls.instances))
 
