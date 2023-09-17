@@ -80,19 +80,22 @@ class Statistic:
         """Возвращает среднее время выполнения функции (в секундах)"""
 
         count = self.get_count()
+        time_format = self._time_units.get(self.get_time_unit_format())
 
         if count:
-            return round(self.avg_time, 18)
+            return round(self.avg_time / time_format, 18)
 
-        raise ZeroDivisionError(f"Невозможно вычислить среднее время работы функции {self.get_name()}, т.к она ни разу не вызывалась")
+        raise ArithmeticError(f"Невозможно вычислить среднее время работы функции {self.get_name()},"
+                              " т.к она ни разу не вызывалась")
 
-    def get_avg_time_per_minute(self) -> float:
+    def get_avg_time_per_unit_time(self) -> float:
         """Возвращает среднее количество выполнений функции в минуту"""
 
         work_finish = self.work_finish
+        time_format = self._time_units.get(self.get_time_unit_format())
 
         if work_finish:
-            return round(60 * self.count / (self.work_finish - self.work_start), 1)
+            return round(60 * time_format * self.count / (self.work_finish - self.work_start), 1)
 
         raise ArithmeticError(f"Невозможно вычислить среднее время работы функции {self.get_name()} в минуту, "
                               "т.к она ни разу не вызывалась")
