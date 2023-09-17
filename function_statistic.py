@@ -37,6 +37,10 @@ class Statistic:
 
         return time_format
 
+    @classmethod
+    def _get_time_unit_value(cls):
+        return cls._time_units.get(cls.get_time_unit_format())
+
     count = StatisticItem()
     func = StatisticItem()
     avg_time = StatisticItem()
@@ -80,7 +84,7 @@ class Statistic:
         """Возвращает среднее время выполнения функции (в секундах)"""
 
         count = self.get_count()
-        time_format = self._time_units.get(self.get_time_unit_format())
+        time_format = self._get_time_unit_value()
 
         if count:
             return round(self.avg_time * time_format, 18)
@@ -92,7 +96,7 @@ class Statistic:
         """Возвращает среднее количество выполнений функции в единицу времени"""
 
         work_finish = self.work_finish
-        time_format = self._time_units.get(self.get_time_unit_format())
+        time_format = self._get_time_unit_value()
 
         if work_finish:
             return round(self.count / ((self.work_finish - self.work_start) * time_format), 1)
