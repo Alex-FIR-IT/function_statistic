@@ -104,7 +104,7 @@ class Statistic:
         """Возвращает кортеж, содержащий: Имя функции, Кол-во вызовов функции,
         Среднее время работы функции, а также Среднее кол-во выполнений функции в минуту"""
 
-        return self.get_name(), self.get_count(), self.get_avg_time(), self.get_avg_time_per_minute()
+        return self.get_name(), self.get_count(), self.get_avg_time(), self.get_avg_time_per_unit_time()
 
     @classmethod
     def get_all_instances_metrics(cls) -> tuple:
@@ -123,6 +123,6 @@ class Statistic:
         func_amount = len(instances)
         count_sum = sum(x.get_count() for x in instances)
         avg_time_all_instances = sum(map(cls.get_avg_time, instances)) / func_amount
-        avg_time_per_minute__all_instances = sum(map(cls.get_avg_time_per_minute, instances)) / func_amount
+        avg_time_per_minute__all_instances = sum(map(cls.get_avg_time_per_unit_time, instances)) / func_amount
 
         return func_amount, count_sum, avg_time_all_instances, round(avg_time_per_minute__all_instances, 1)
