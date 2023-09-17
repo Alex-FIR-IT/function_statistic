@@ -18,7 +18,7 @@ class StatisticItem:
 class Statistic:
 
     instances = []
-    _time_units = {"minutes":  1, "seconds": 60}
+    _time_units = {"minutes":  1/60, "seconds": 1}
     _active_time_unit = "minutes"
 
     @classmethod
@@ -62,7 +62,7 @@ class Statistic:
         func_result = self.func(*args, **kwargs)
         self.work_finish = time()
 
-        self.avg_time = (self.work_finish - work_start) / self.count
+        self.avg_time = (self.avg_time + self.work_finish - work_start) / self.count
 
         return func_result
 
@@ -83,19 +83,19 @@ class Statistic:
         time_format = self._time_units.get(self.get_time_unit_format())
 
         if count:
-            return round(self.avg_time / time_format, 18)
+            return round(self.avg_time * time_format, 18)
 
         raise ArithmeticError(f"Невозможно вычислить среднее время работы функции {self.get_name()},"
                               " т.к она ни разу не вызывалась")
 
     def get_avg_time_per_unit_time(self) -> float:
-        """Возвращает среднее количество выполнений функции в минуту"""
+        """Возвращает среднее количество выполнений функции в единицу времени"""
 
         work_finish = self.work_finish
         time_format = self._time_units.get(self.get_time_unit_format())
 
         if work_finish:
-            return round(60 * time_format * self.count / (self.work_finish - self.work_start), 1)
+            return round(self.count / ((self.work_finish - self.work_start) * time_format), 1)
 
         raise ArithmeticError(f"Невозможно вычислить среднее время работы функции {self.get_name()} в минуту, "
                               "т.к она ни разу не вызывалась")
