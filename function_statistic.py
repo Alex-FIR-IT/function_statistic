@@ -17,12 +17,12 @@ class StatisticItem:
 
 class Statistic:
 
-    instances = []
+    _instances = []
     _time_units = {"microsecond": 1_000_000, "second": 1, "minute":  1/60, "hour": 1/3600}
     _active_time_unit = "second"
 
     @classmethod
-    def set_time_unit_format(cls, time_unit: str = 'minute') -> None:
+    def set_time_unit_format(cls, time_unit: str = 'second') -> None:
         cls._active_time_unit = cls._is_in_time_units(time_unit)
 
     @classmethod
@@ -50,7 +50,7 @@ class Statistic:
 
     def __new__(cls, *args, **kwargs):
         instance = object.__new__(cls)
-        cls.instances.append(instance)
+        cls._instances.append(instance)
 
         return instance
 
@@ -112,7 +112,7 @@ class Statistic:
     def get_all_instances_metrics(cls) -> tuple | None:
         """Возвращает кортеж, содержащий значения get_all_metrics для всех экземпляров класса"""
 
-        all_instances_metrics = tuple(instance.get_all_metrics() for instance in filter(cls.get_count, cls.instances))
+        all_instances_metrics = tuple(instance.get_all_metrics() for instance in filter(cls.get_count, cls._instances))
         return all_instances_metrics if all_instances_metrics else None
 
     @classmethod
@@ -123,7 +123,7 @@ class Statistic:
          Среднее время работы всех функций,
          Среднее время кол-во выполнений всех функций в единицу времени (дефолт: в секунду)"""
 
-        instances = tuple(filter(cls.get_count, cls.instances))
+        instances = tuple(filter(cls.get_count, cls._instances))
 
         func_amount = len(instances)
         count_sum = sum(x.get_count() for x in instances)
