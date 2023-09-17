@@ -18,6 +18,7 @@ class StatisticItem:
 class Statistic:
 
     instances = []
+    time_units = {"minutes": 60, "seconds": 3600}
 
     count = StatisticItem()
     func = StatisticItem()
