@@ -18,7 +18,24 @@ class StatisticItem:
 class Statistic:
 
     instances = []
-    time_units = {"minutes": 60, "seconds": 3600}
+    _time_units = {"minutes":  1, "seconds": 60}
+    _active_time_unit = "minutes"
+
+    @classmethod
+    def set_time_unit_format(cls, time_unit='minutes'):
+        cls._active_time_unit = cls._is_in_time_units(time_unit)
+
+    @classmethod
+    def get_time_unit_format(cls):
+        return cls._active_time_unit
+
+    @classmethod
+    def _is_in_time_units(cls, time_format):
+        if time_format not in cls._time_units:
+            message = f"Такого формата нет, доступные форматы: {', '.join(x for x in cls._time_units.keys())}"
+            raise KeyError(message)
+
+        return time_format
 
     count = StatisticItem()
     func = StatisticItem()
