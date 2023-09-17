@@ -81,7 +81,7 @@ class Statistic:
 
         return self.count
 
-    def get_avg_time(self) -> float:
+    def get_avg_time(self) -> float | None:
         """Возвращает среднее время выполнения функции (в секундах)"""
 
         count = self.get_count()
@@ -90,7 +90,7 @@ class Statistic:
         if count:
             return round(self.avg_time * time_format, 18)
 
-    def get_avg_time_per_unit_time(self) -> float:
+    def get_avg_time_per_unit_time(self) -> float | None:
         """Возвращает среднее количество выполнений функции в единицу времени"""
 
         work_finish = self.work_finish
@@ -99,7 +99,7 @@ class Statistic:
         if work_finish:
             return round(self.count / ((self.work_finish - self.work_start) * time_format), 1)
 
-    def get_all_metrics(self) -> tuple:
+    def get_all_metrics(self) -> tuple[str, int, float | None, float | None]:
         """Возвращает кортеж, содержащий: Имя функции, Кол-во вызовов функции,
         Среднее время работы функции, а также Среднее кол-во выполнений функции в минуту"""
 
@@ -113,7 +113,7 @@ class Statistic:
         return all_instances_metrics if all_instances_metrics else None
 
     @classmethod
-    def get_average_instances_metrics(cls) -> tuple:
+    def get_average_instances_metrics(cls) -> tuple[int, int, float | None, float | None]:
         """Возвращает среднюю статистику по всем функциям, а именно:
          Общее количество вызванных уникальных функций,
          Общее количество вызовов функций,
