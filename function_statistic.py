@@ -44,6 +44,14 @@ class Statistic:
     def _get_time_unit_value(cls) -> int | float:
         return cls._time_units.get(cls.get_time_unit_format())
 
+    @classmethod
+    def set_output_format(cls, output_format=tuple) -> None:
+        cls._active_output_format = cls._output_formats.get(output_format)
+
+    @classmethod
+    def get_output_format(cls) -> any:
+        return cls._active_output_format
+
     count = StatisticItem()
     func = StatisticItem()
     avg_time = StatisticItem()
