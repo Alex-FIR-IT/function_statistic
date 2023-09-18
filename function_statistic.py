@@ -158,8 +158,11 @@ class Statistic:
     def get_all_instances_metrics(cls) -> tuple | None:
         """Возвращает кортеж, содержащий значения get_all_metrics для всех экземпляров класса"""
 
-        all_instances_metrics = tuple(instance.get_all_metrics() for instance in filter(cls.get_count, cls._instances))
-        return all_instances_metrics if all_instances_metrics else None
+        instances = tuple(filter(cls.get_count, cls._instances))
+        all_instances_metrics = tuple(instance.get_all_metrics() for instance in instances)
+        output = cls._convert_to_output_format(*all_instances_metrics, instances=instances, sep=";") if all_instances_metrics else None
+
+        return output
 
     @classmethod
     def get_average_instances_metrics(cls) -> tuple[int, int, float | None, float | None]:
