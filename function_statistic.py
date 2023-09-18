@@ -160,7 +160,8 @@ class Statistic:
 
         instances = tuple(filter(cls.get_count, cls._instances))
         all_instances_metrics = tuple(instance.get_all_metrics() for instance in instances)
-        output = cls._convert_to_output_format(*all_instances_metrics, instances=instances, sep=";") if all_instances_metrics else None
+        output = cls._convert_to_output_format(*all_instances_metrics,
+                                               instances=instances, sep=";") if all_instances_metrics else None
 
         return output
 
@@ -186,6 +187,7 @@ class Statistic:
         output = cls._convert_to_output_format(func_amount,
                                                count_sum,
                                                avg_time_all_instances,
-                                               round(avg_time_per_minute__all_instances, 1), keys_for_values=keys_for_values)
+                                               round(avg_time_per_minute__all_instances, 1),
+                                               keys_for_values=keys_for_values)
 
         return output
