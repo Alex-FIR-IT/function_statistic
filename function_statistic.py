@@ -20,6 +20,8 @@ class Statistic:
     _instances = []
     _time_units = {"microsecond": 1_000_000, "second": 1, "minute":  1/60, "hour": 1/3600}
     _active_time_unit = "second"
+    _output_formats = {tuple: "tuple", str: "str", dict: "dict"}
+    _active_output_format = "tuple"
 
     @classmethod
     def set_time_unit_format(cls, time_unit: str = 'second') -> None:
