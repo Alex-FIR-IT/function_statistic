@@ -67,6 +67,23 @@ class Statistic:
 
         return keys
 
+    @classmethod
+    def _convert_to_output_format(cls, *args, instances=None, sep=",", keys_for_values=None):
+        output_format = cls.get_output_format()
+
+        match output_format:
+            case "tuple":
+                output = args
+            case "str":
+                output = f"{sep} ".join(str(value) for value in args)
+            case "dict":
+                keys = cls._make_keys(instances, keys_for_values=keys_for_values)
+                output = {next(keys): value for value in args}
+            case _:
+                types = cls._output_formats.values()
+                raise TypeError(f"Неподдерживаемый тип данных. Доступные типы {', '.join(types)}")
+        return output
+
     count = StatisticItem()
     func = StatisticItem()
     avg_time = StatisticItem()
