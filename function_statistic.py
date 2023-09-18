@@ -141,14 +141,18 @@ class Statistic:
         if work_finish:
             return round(self.count / ((self.work_finish - self.work_start) * time_format), 1)
 
-    def get_all_metrics(self) -> tuple[str, int, float | None, float | None]:
+    def get_all_metrics(self) -> tuple[str, int, float | None, float | None] | str | dict:
         """Возвращает кортеж, содержащий:
         Имя функции,
         Кол-во вызовов функции,
         Среднее время работы функции,
         Среднее кол-во выполнений функции в единицу времени (дефолт: в секундах)"""
+        output = self._convert_to_output_format(self.get_name(),
+                                                self.get_count(),
+                                                self.get_avg_time(),
+                                                self.get_avg_time_per_unit_time())
 
-        return self.get_name(), self.get_count(), self.get_avg_time(), self.get_avg_time_per_unit_time()
+        return output
 
     @classmethod
     def get_all_instances_metrics(cls) -> tuple | None:
