@@ -165,7 +165,7 @@ class Statistic:
         return output
 
     @classmethod
-    def get_average_instances_metrics(cls) -> tuple[int, int, float | None, float | None]:
+    def get_average_instances_metrics(cls) -> tuple[int, int, float | None, float | None] | str | dict:
         """Возвращает среднюю статистику по всем функциям, а именно:
          Общее количество вызванных уникальных функций,
          Общее количество вызовов функций,
@@ -176,11 +176,16 @@ class Statistic:
 
         func_amount = len(instances)
         count_sum = sum(x.get_count() for x in instances)
+        avg_time_all_instances = avg_time_per_minute__all_instances = None
 
-        if not func_amount:
-            return func_amount, count_sum, None, None
+        if func_amount:
+            avg_time_all_instances = sum(map(cls.get_avg_time, instances)) / func_amount
+            avg_time_per_minute__all_instances = sum(map(cls.get_avg_time_per_unit_time, instances)) / func_amount
 
-        avg_time_all_instances = sum(map(cls.get_avg_time, instances)) / func_amount
-        avg_time_per_minute__all_instances = sum(map(cls.get_avg_time_per_unit_time, instances)) / func_amount
+        keys_for_values = ('Unique_count', 'Count', 'Average_time', f'Average_time_per_{cls.get_time_unit_format()}')
+        output = cls._convert_to_output_format(func_amount,
+                                               count_sum,
+                                               avg_time_all_instances,
+                                               round(avg_time_per_minute__all_instances, 1), keys_for_values=keys_for_values)
 
-        return func_amount, count_sum, avg_time_all_instances, round(avg_time_per_minute__all_instances, 1)
+        return output
