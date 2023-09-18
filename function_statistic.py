@@ -52,6 +52,21 @@ class Statistic:
     def get_output_format(cls) -> any:
         return cls._active_output_format
 
+    @classmethod
+    def _make_keys(cls, instances, keys_for_values=None):
+        try:
+            if instances is None:
+                raise TypeError()
+
+            keys = (x.func.__name__ for x in instances)
+        except TypeError:
+            if keys_for_values:
+                keys = iter(keys_for_values)
+            else:
+                keys = iter(("Name", "Count", "Average_time", f"Average_time_per_{cls.get_time_unit_format()}"))
+
+        return keys
+
     count = StatisticItem()
     func = StatisticItem()
     avg_time = StatisticItem()
