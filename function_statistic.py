@@ -32,7 +32,7 @@ class Statistic:
         return cls._active_time_unit
 
     @classmethod
-    def _is_in_permitted_values(cls, time_format: any, permitted_value: dict) -> str:
+    def _is_in_permitted_values(cls, time_format: any, permitted_value: dict) -> any:
         if time_format not in permitted_value:
             message = f"Введенного вами формата не существует, " \
                       f"доступные форматы: {', '.join(x for x in cls._time_units.keys())}"
