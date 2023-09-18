@@ -25,15 +25,15 @@ class Statistic:
 
     @classmethod
     def set_time_unit_format(cls, time_unit: str = 'second') -> None:
-        cls._active_time_unit = cls._is_in_time_units(time_unit)
+        cls._active_time_unit = cls._is_in_permitted_values(time_unit, cls._time_units)
 
     @classmethod
     def get_time_unit_format(cls) -> str:
         return cls._active_time_unit
 
     @classmethod
-    def _is_in_time_units(cls, time_format: str) -> str:
-        if time_format not in cls._time_units:
+    def _is_in_permitted_values(cls, time_format: any, permitted_value: dict) -> str:
+        if time_format not in permitted_value:
             message = f"Введенного вами формата не существует, " \
                       f"доступные форматы: {', '.join(x for x in cls._time_units.keys())}"
             raise KeyError(message)
