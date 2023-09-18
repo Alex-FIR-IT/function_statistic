@@ -132,7 +132,7 @@ class Statistic:
         if count:
             return round(self.avg_time * time_format, 18)
 
-    def get_avg_time_per_unit_time(self) -> float | None:
+    def get_avg_executions_per_unit_time(self) -> float | None:
         """Возвращает среднее количество выполнений функции в единицу времени (дефолт: в секунду)"""
 
         work_finish = self.work_finish
@@ -150,7 +150,7 @@ class Statistic:
         output = self._convert_to_output_format(self.get_name(),
                                                 self.get_count(),
                                                 self.get_avg_time(),
-                                                self.get_avg_time_per_unit_time())
+                                                self.get_avg_executions_per_unit_time())
 
         return output
 
@@ -181,7 +181,7 @@ class Statistic:
 
         if func_amount:
             avg_time_all_instances = sum(map(cls.get_avg_time, instances)) / func_amount
-            avg_time_per_minute__all_instances = sum(map(cls.get_avg_time_per_unit_time, instances)) / func_amount
+            avg_time_per_minute__all_instances = sum(map(cls.get_avg_executions_per_unit_time, instances)) / func_amount
 
         keys_for_values = ('Unique_count', 'Count', 'Average_time', f'Average_time_per_{cls.get_time_unit_format()}')
         output = cls._convert_to_output_format(func_amount,
