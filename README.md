@@ -48,13 +48,15 @@
 4) get_all_instances_metrics
 5) get_average_instances_metrics
 
+Возможные значения: 'microsecond' or 'second' or 'minute' or 'hour'
 - #### *classmethod* Statistic.get_time_unit_format(cls) -> str
 Позволяет получить временною единицу, в которою переводятся все статистические метрики
 (по умолчанию принимает значение - second)
 
 - #### *classmethod* Statistic.set_output_format(cls, output_format=tuple) -> None
 Позволяет пользователю установить формат вывода статистических данных.
-Доступные типы для вывода находятся в _output_formats
+Имеет 1 параметр, в который записывается класс необходимых данных.
+Возможные значения: tuple or str or dict.
 
 - #### *classmethod* Statistic.get_output_format(cls) -> str
 Позволяет пользователю получить формат вывода статистических данных (_active_output_format).
