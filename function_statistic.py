@@ -63,6 +63,9 @@ class Statistic:
 
     @classmethod
     def set_output_format(cls, output_format=tuple) -> None:
+        """Позволяет пользователю установить формат вывода статистических данных.
+        Доступные типы для вывода находятся в _output_formats"""
+
         cls._active_output_format = cls._output_formats.get(output_format)
 
     @classmethod
