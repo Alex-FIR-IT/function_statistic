@@ -26,13 +26,8 @@ class Statistic:
 
     @classmethod
     def set_time_unit_format(cls, time_unit: str = 'second') -> None:
-        """Позволяет установить временную единицу, которая используется при выводе статистических метрик
-        в таких методах, как:
-        1) get_avg_time
-        2) get_avg_executions_per_unit_time
-        3) get_all_metrics
-        4) get_all_instances_metrics
-        5) get_average_instances_metrics"""
+        """Позволяет установить временную единицу, которая используется при выводе статистических метрик.
+        Возможные значения: 'microsecond' or 'second' or 'minute' or 'hour'"""
 
         cls._active_time_unit = cls._is_in_permitted_values(time_unit, cls._time_units)
 
@@ -65,7 +60,8 @@ class Statistic:
     @classmethod
     def set_output_format(cls, output_format=tuple) -> None:
         """Позволяет пользователю установить формат вывода статистических данных.
-        Доступные типы для вывода находятся в _output_formats"""
+        Имеет 1 параметр, в который записывается класс необходимых данных.
+        Возможные значения: 'microsecond' or 'second' or 'minute' or 'hour'"""
 
         cls._active_output_format = cls._output_formats.get(output_format)
 
