@@ -26,10 +26,15 @@ class Statistic:
 
     @classmethod
     def set_time_unit_format(cls, time_unit: str = 'second') -> None:
+
+
         cls._active_time_unit = cls._is_in_permitted_values(time_unit, cls._time_units)
 
     @classmethod
     def get_time_unit_format(cls) -> str:
+        """Позволяет получить временною единицу, в которою переводятся все статистические метрики
+        (по умолчанию принимает значение 'second'"""
+
         return cls._active_time_unit
 
     @classmethod
