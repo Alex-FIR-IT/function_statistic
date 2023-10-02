@@ -56,6 +56,7 @@
 - #### *classmethod* Statistic.set_output_format(cls, output_format=tuple) -> None
 Позволяет пользователю установить формат вывода статистических данных.
 Имеет 1 параметр, в который записывается класс необходимых данных.
+
 Возможные значения: tuple or str or dict.
 
 - #### *classmethod* Statistic.get_output_format(cls) -> str
