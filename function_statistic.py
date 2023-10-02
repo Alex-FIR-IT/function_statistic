@@ -1,4 +1,5 @@
 from time import time
+from typing import Union, Tuple, Optional
 
 """Данная библиотека содержит декоратор, предназначеннный для получения статистики работы декорированной функции"""
 
@@ -32,16 +33,16 @@ class Statistic:
         return cls._active_time_unit
 
     @classmethod
-    def _is_in_permitted_values(cls, time_format: any, permitted_value: dict) -> any:
-        if time_format not in permitted_value:
+    def _is_in_permitted_values(cls, time_unit: str, permitted_value: dict) -> str:
+        if time_unit not in permitted_value:
             message = f"Введенного вами формата не существует, " \
                       f"доступные форматы: {', '.join(x for x in cls._time_units.keys())}"
             raise KeyError(message)
 
-        return time_format
+        return time_unit
 
     @classmethod
-    def _get_time_unit_value(cls) -> int | float:
+    def _get_time_unit_value(cls) -> Union[int, float]:
         return cls._time_units.get(cls.get_time_unit_format())
 
     @classmethod
@@ -49,11 +50,11 @@ class Statistic:
         cls._active_output_format = cls._output_formats.get(output_format)
 
     @classmethod
-    def get_output_format(cls) -> any:
+    def get_output_format(cls) -> str:
         return cls._active_output_format
 
     @classmethod
-    def _make_keys(cls, instances, keys_for_values=None):
+    def _make_keys(cls, instances, keys_for_values=None) -> iter:
         try:
             if instances is None:
                 raise TypeError()
@@ -68,20 +69,19 @@ class Statistic:
         return keys
 
     @classmethod
-    def _convert_to_output_format(cls, *args, instances=None, sep=",", keys_for_values=None):
+    def _convert_to_output_format(cls, *args, instances=None, sep=",", keys_for_values=None) -> Union[Tuple, str, dict]:
         output_format = cls.get_output_format()
 
-        match output_format:
-            case "tuple":
-                output = args
-            case "str":
-                output = f"{sep} ".join(str(value) for value in args)
-            case "dict":
-                keys = cls._make_keys(instances, keys_for_values=keys_for_values)
-                output = {next(keys): value for value in args}
-            case _:
-                types = cls._output_formats.values()
-                raise TypeError(f"Неподдерживаемый тип данных. Доступные типы {', '.join(types)}")
+        if output_format == "tuple":
+            output = args
+        elif output_format == "str":
+            output = f"{sep} ".join(str(value) for value in args)
+        elif output_format == "dict":
+            keys = cls._make_keys(instances, keys_for_values=keys_for_values)
+            output = {next(keys): value for value in args}
+        else:
+            types = cls._output_formats.values()
+            raise TypeError(f"Неподдерживаемый тип данных. Доступные типы {', '.join(types)}")
         return output
 
     count = StatisticItem()
@@ -123,7 +123,7 @@ class Statistic:
 
         return self.count
 
-    def get_avg_time(self) -> float | None:
+    def get_avg_time(self) -> Optional[float]:
         """Возвращает среднее время выполнения функции (дефолт: в секундах)"""
 
         count = self.get_count()
@@ -132,7 +132,7 @@ class Statistic:
         if count:
             return round(self.avg_time * time_format, 18)
 
-    def get_avg_executions_per_unit_time(self) -> float | None:
+    def get_avg_executions_per_unit_time(self) -> Optional[float]:
         """Возвращает среднее количество выполнений функции в единицу времени (дефолт: в секунду)"""
 
         work_finish = self.work_finish
@@ -141,7 +141,7 @@ class Statistic:
         if work_finish:
             return round(self.count / ((self.work_finish - self.work_start) * time_format), 1)
 
-    def get_all_metrics(self) -> tuple[str, int, float | None, float | None] | str | dict:
+    def get_all_metrics(self) -> Union[Tuple[str, int, Optional[float], Optional[float]], str, dict]:
         """Возвращает кортеж, содержащий:
         Имя функции,
         Кол-во вызовов функции,
@@ -155,7 +155,7 @@ class Statistic:
         return output
 
     @classmethod
-    def get_all_instances_metrics(cls) -> tuple | None:
+    def get_all_instances_metrics(cls) -> Optional[Tuple]:
         """Возвращает кортеж, содержащий значения get_all_metrics для всех экземпляров класса"""
 
         instances = tuple(filter(cls.get_count, cls._instances))
@@ -166,7 +166,7 @@ class Statistic:
         return output
 
     @classmethod
-    def get_average_instances_metrics(cls) -> tuple[int, int, float | None, float | None] | str | dict:
+    def get_average_instances_metrics(cls) -> Union[Tuple[int, int, Optional[float], Optional[float]], str, dict]:
         """Возвращает среднюю статистику по всем функциям, а именно:
          Общее количество вызванных уникальных функций,
          Общее количество вызовов функций,
