@@ -92,6 +92,9 @@ class Statistic:
 
     @classmethod
     def _convert_to_output_format(cls, *args, instances=None, sep=",", keys_for_values=None) -> Union[Tuple, str, dict]:
+        """Возвращает статистические метрики в выбранном пользователе формате.
+        Вывод определяет переменная _active_output_format (по умолчанию принимает значение tuple)"""
+
         output_format = cls.get_output_format()
 
         if output_format == "tuple":
