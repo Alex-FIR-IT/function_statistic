@@ -172,6 +172,7 @@ class Statistic:
         Кол-во вызовов функции,
         Среднее время работы функции,
         Среднее кол-во выполнений функции в единицу времени (дефолт: в секундах)"""
+
         output = self._convert_to_output_format(self.get_name(),
                                                 self.get_count(),
                                                 self.get_avg_time(),
