@@ -26,19 +26,26 @@ class Statistic:
 
     @classmethod
     def set_time_unit_format(cls, time_unit: str = 'second') -> None:
-
+        """Позволяет установить временную единицу, которая используется при выводе статистических метрик
+        в таких методах, как:
+        1) get_avg_time
+        2) get_avg_executions_per_unit_time
+        3) get_all_metrics
+        4) get_all_instances_metrics
+        5) get_average_instances_metrics"""
 
         cls._active_time_unit = cls._is_in_permitted_values(time_unit, cls._time_units)
 
     @classmethod
     def get_time_unit_format(cls) -> str:
         """Позволяет получить временною единицу, в которою переводятся все статистические метрики
-        (по умолчанию принимает значение 'second'"""
+        (по умолчанию принимает значение - second)"""
 
         return cls._active_time_unit
 
     @classmethod
     def _is_in_permitted_values(cls, time_unit: str, permitted_value: dict) -> str:
+        """Проверяет, что значение time_unit находится в permitted_value. Используется в set_time_unit_format"""
         if time_unit not in permitted_value:
             message = f"Введенного вами формата не существует, " \
                       f"доступные форматы: {', '.join(x for x in cls._time_units.keys())}"
