@@ -46,6 +46,7 @@ class Statistic:
     @classmethod
     def _is_in_permitted_values(cls, time_unit: str, permitted_value: dict) -> str:
         """Проверяет, что значение time_unit находится в permitted_value. Используется в set_time_unit_format"""
+
         if time_unit not in permitted_value:
             message = f"Введенного вами формата не существует, " \
                       f"доступные форматы: {', '.join(x for x in cls._time_units.keys())}"
