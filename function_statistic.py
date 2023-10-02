@@ -78,6 +78,9 @@ class Statistic:
 
     @classmethod
     def _make_keys(cls, instances, keys_for_values=None) -> iter:
+        """Возвращает итератор из значений,
+        которые будут являться ключами при выборе словаря как типа вывода статистических данных """
+
         try:
             if instances is None:
                 raise TypeError()
