@@ -55,6 +55,10 @@ class Statistic:
 
     @classmethod
     def _get_time_unit_value(cls) -> Union[int, float]:
+        """Позволяет получить числовой коэфициент,
+        который используется при пересчете статистических метрик в определенный временной формат
+        (например для перевода среднего времени выполнения функции (get_avg_time) из секунд в минут и т.д.)"""
+
         return cls._time_units.get(cls.get_time_unit_format())
 
     @classmethod
