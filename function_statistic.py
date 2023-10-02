@@ -61,7 +61,7 @@ class Statistic:
     def set_output_format(cls, output_format=tuple) -> None:
         """Позволяет пользователю установить формат вывода статистических данных.
         Имеет 1 параметр, в который записывается класс необходимых данных.
-        Возможные значения: 'microsecond' or 'second' or 'minute' or 'hour'"""
+        Возможные значения: tuple or str or dict"""
 
         cls._active_output_format = cls._output_formats.get(output_format)
 
