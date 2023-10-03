@@ -63,28 +63,33 @@
 Позволяет пользователю получить формат вывода статистических данных (_active_output_format).
 По умолчанию этот параметр - tuple.
 
-- #### instance.get_name(self) -> str
+- #### instance._get_name(self) -> str
 Возвращает имя функции.
 
-- #### instance.get_count(self) -> int
+- #### instance._get_count(self) -> int
 Возвращает количество вызовов функции.
 
-- #### instance.get_avg_time(self) -> Optional[float]
+- #### instance._get_avg_time(self) -> Optional[float]
 Возвращает среднее время выполнения функции (по умолчанию в секундах).
 
-- #### instance.get_avg_executions_per_unit_time(self) -> Optional[float]
+- #### instance._get_avg_executions_per_unit_time(self) -> Optional[float]
 Возвращает среднее количество выполнений функции в единицу времени (дефолт: в секунду)
 
-- #### instance.get_all_metrics(self) -> Union[Tuple[str, int, Optional[float], Optional[float]], str, dict]
+- #### instance._get_all_metrics(self) -> Union[Tuple[str, int, Optional[float], Optional[float]], str, dict]
 Возвращает кортеж, содержащий следующие параметры:
 1) Имя функции;
 2) Кол-во вызовов функции;
 3) Среднее время работы функции;
 4) Среднее кол-во выполнений функции в единицу времени (дефолт: в секундах).
 
-- #### *classmethod* Statistic.get_all_instances_metrics(cls) -> Optional[Tuple]
-Возвращает данные в выбранном пользователем формате (по умолчанию - tuple),
-содержащий значения get_all_metrics для всех экземпляров класса (декорированных функций).
+- #### *classmethod* Statistic.get_instances_metrics(cls, instances_names: tuple = ()) -> Optional[Tuple]
+Принимает кортеж, состоящий из имен декорированных функций.
+Возвращает для переданных декорированных функций\методов в выбранном пользователем формате (по умолчанию tuple)
+слудующие данные (по умолчанию возвращает информацию по все инстансам):
+1) Имя функции,
+2) Кол-во вызовов функции,
+3) Среднее время работы функции,
+4) Среднее кол-во выполнений функции в единицу времени (дефолт: в секундах)
 
 - #### *classmethod* Statistic.get_average_instances_metrics(cls) -> Union[Tuple[int, int, Optional[float], Optional[float]], str, dict]:
 Возвращает среднюю статистику по всем функциям, а именно:
