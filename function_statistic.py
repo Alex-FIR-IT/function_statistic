@@ -1,5 +1,6 @@
 from time import time
 from typing import Union, Tuple, Optional
+from functools import wraps
 
 """Данная библиотека содержит декоратор, предназначеннный для получения статистики работы декорированной функции"""
 
@@ -53,7 +54,7 @@ class Statistic:
     def _get_time_unit_value(cls) -> Union[int, float]:
         """Позволяет получить числовой коэфициент,
         который используется при пересчете статистических метрик в определенный временной формат
-        (например для перевода среднего времени выполнения функции (get_avg_time) из секунд в минуты и т.д.)"""
+        (например для перевода среднего времени выполнения функции (_get_avg_time) из секунд в минуты и т.д.)"""
 
         return cls._time_units.get(cls.get_time_unit_format())
 
@@ -86,7 +87,7 @@ class Statistic:
             if keys_for_values:
                 keys = iter(keys_for_values)
             else:
-                keys = iter(("Name", "Count", "Average_time", f"Average_time_per_{cls.get_time_unit_format()}"))
+                keys = iter(("Name", "Count", "Average_time", f"Avg_exec_times_per_{cls.get_time_unit_format()}"))
 
         return keys
 
@@ -121,43 +122,47 @@ class Statistic:
 
         return instance
 
-    def __init__(self, func):
-        self.func = func
+    def __init__(self):
         self.count = self.avg_time = 0
         self.work_start = time()
         self.work_finish = None
 
-    def __call__(self, *args, **kwargs):
-        self.count += 1
+    def __call__(self, func):
+        self.func = func
 
-        work_start = time()
-        func_result = self.func(*args, **kwargs)
-        self.work_finish = time()
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            self.count += 1
 
-        self.avg_time = (self.avg_time + self.work_finish - work_start) / self.count
+            work_start = time()
+            func_res = func(*args, **kwargs)
+            self.work_finish = time()
 
-        return func_result
+            self.avg_time = (self.avg_time + self.work_finish - work_start) / self.count
+            return func_res
 
-    def get_name(self) -> str:
+        return wrapper
+
+    def _get_name(self) -> str:
         """Возвращает имя функции"""
 
         return self.func.__name__
 
-    def get_count(self) -> int:
+    def _get_count(self) -> int:
         """Возвращает кол-во вызовов функции"""
 
         return self.count
 
-    def get_avg_time(self) -> Optional[float]:
+    def _get_avg_time(self) -> Optional[float]:
         """Возвращает среднее время выполнения функции (дефолт: в секундах)"""
 
-        count = self.get_count()
+        count = self._get_count()
         time_format = self._get_time_unit_value()
 
         if count:
             return round(self.avg_time * time_format, 18)
 
-    def get_avg_executions_per_unit_time(self) -> Optional[float]:
+    def _get_avg_executions_per_unit_time(self) -> Optional[float]:
         """Возвращает среднее количество выполнений функции в единицу времени (дефолт: в секунду)"""
 
         work_finish = self.work_finish
@@ -166,27 +171,37 @@ class Statistic:
         if work_finish:
             return round(self.count / ((self.work_finish - self.work_start) * time_format), 1)
 
-    def get_all_metrics(self) -> Union[Tuple[str, int, Optional[float], Optional[float]], str, dict]:
+    def _get_all_metrics(self) -> Union[Tuple[str, int, Optional[float], Optional[float]], str, dict]:
         """Возвращает кортеж, содержащий:
-        Имя функции,
-        Кол-во вызовов функции,
-        Среднее время работы функции,
-        Среднее кол-во выполнений функции в единицу времени (дефолт: в секундах)"""
+        0) Имя функции,
+        1) Кол-во вызовов функции,
+        2) Среднее время работы функции,
+        3) Среднее кол-во выполнений функции в единицу времени (дефолт: в секундах)"""
 
-        output = self._convert_to_output_format(self.get_name(),
-                                                self.get_count(),
-                                                self.get_avg_time(),
-                                                self.get_avg_executions_per_unit_time())
+        output = self._convert_to_output_format(self._get_name(),
+                                                self._get_count(),
+                                                self._get_avg_time(),
+                                                self._get_avg_executions_per_unit_time())
 
         return output
 
     @classmethod
-    def get_all_instances_metrics(cls) -> Optional[Tuple]:
-        """Возвращает данные в выбранном пользователем формате (по умолчанию - tuple),
-        содержащий значения get_all_metrics для всех экземпляров класса"""
+    def get_instances_metrics(cls, instances_names: tuple = ()) -> Optional[Tuple]:
+        """Принимает кортеж, состоящий из имен декорированных функций.
+        Возвращает для переданных декорированных функций\методов в выбранном пользователем формате (по умолчанию tuple)
+        слудующие данные (по умолчанию возвращает информацию по все инстансам):
+        0) Имя функции,
+        1) Кол-во вызовов функции,
+        2) Среднее время работы функции,
+        3) Среднее кол-во выполнений функции в единицу времени (дефолт: в секундах)"""
 
-        instances = tuple(filter(cls.get_count, cls._instances))
-        all_instances_metrics = tuple(instance.get_all_metrics() for instance in instances)
+        if instances_names:
+            instances = tuple(instance for instance in cls._instances
+                              if instance._get_name() in instances_names)
+        else:
+            instances = tuple(filter(cls._get_count, cls._instances))
+
+        all_instances_metrics = tuple(instance._get_all_metrics() for instance in instances)
         output = cls._convert_to_output_format(*all_instances_metrics,
                                                instances=instances, sep=";") if all_instances_metrics else None
 
@@ -195,22 +210,22 @@ class Statistic:
     @classmethod
     def get_average_instances_metrics(cls) -> Union[Tuple[int, int, Optional[float], Optional[float]], str, dict]:
         """Возвращает среднюю статистику по всем функциям, а именно:
-         Общее количество вызванных уникальных функций,
-         Общее количество вызовов функций,
-         Среднее время работы всех функций,
-         Среднее время кол-во выполнений всех функций в единицу времени (дефолт: в секунду)"""
+         0) Общее количество уникальных вызовов,
+         1) Общее количество вызовов функций,
+         2) Среднее время работы всех функций,
+         3) Среднее кол-во выполнений всех функций в единицу времени (дефолт: в секунду)"""
 
-        instances = tuple(filter(cls.get_count, cls._instances))
+        instances = tuple(filter(cls._get_count, cls._instances))
 
         func_amount = len(instances)
-        count_sum = sum(x.get_count() for x in instances)
+        count_sum = sum(x._get_count() for x in instances)
         avg_time_all_instances = avg_time_per_minute__all_instances = None
 
         if func_amount:
-            avg_time_all_instances = sum(map(cls.get_avg_time, instances)) / func_amount
-            avg_time_per_minute__all_instances = sum(map(cls.get_avg_executions_per_unit_time, instances)) / func_amount
+            avg_time_all_instances = sum(map(cls._get_avg_time, instances)) / func_amount
+            avg_time_per_minute__all_instances = sum(map(cls._get_avg_executions_per_unit_time, instances)) / func_amount
 
-        keys_for_values = ('Unique_count', 'Count', 'Average_time', f'Average_time_per_{cls.get_time_unit_format()}')
+        keys_for_values = ('Unique_count', 'Count', 'Average_time', f'Avg_exec_times_per_{cls.get_time_unit_format()}')
         output = cls._convert_to_output_format(func_amount,
                                                count_sum,
                                                avg_time_all_instances,
