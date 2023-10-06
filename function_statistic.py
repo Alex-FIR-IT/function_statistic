@@ -115,6 +115,7 @@ class Statistic:
     avg_time = StatisticItem()
     work_start = StatisticItem()
     work_finish = StatisticItem()
+    total_time = StatisticItem()
 
     def __new__(cls, *args, **kwargs):
         instance = object.__new__(cls)
@@ -123,7 +124,7 @@ class Statistic:
         return instance
 
     def __init__(self):
-        self.count = self.avg_time = 0
+        self.count = self.avg_time = self.total_time = 0
         self.work_start = time()
         self.work_finish = None
 
@@ -137,8 +138,9 @@ class Statistic:
             work_start = time()
             func_res = func(*args, **kwargs)
             self.work_finish = time()
+            self.total_time += self.work_finish - work_start
 
-            self.avg_time = (self.avg_time + self.work_finish - work_start) / self.count
+            self.avg_time = self.total_time / self.count
             return func_res
 
         return wrapper
