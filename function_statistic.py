@@ -1,20 +1,9 @@
 from time import time
-from typing import Union, Tuple, Optional
+from typing import Union, Tuple, Optional, Any
 from functools import wraps
+from additional import StatisticItem, Log
 
 """Данная библиотека содержит декоратор, предназначеннный для получения статистики работы декорированной функции"""
-
-
-class StatisticItem:
-
-    def __set_name__(self, owner, name):
-        self.__name = f"_{owner.__name__}__{name}"
-
-    def __get__(self, instance, owner):
-        return getattr(instance, self.__name)
-
-    def __set__(self, instance, value):
-        setattr(instance, self.__name, value)
 
 
 class Statistic:
@@ -22,8 +11,19 @@ class Statistic:
     _instances = []
     _time_units = {"microsecond": 1_000_000, "second": 1, "minute":  1/60, "hour": 1/3600}
     _active_time_unit = "second"
-    _output_formats = {tuple: "tuple", str: "str", dict: "dict"}
-    _active_output_format = "tuple"
+    _output_formats = {"tuple": tuple, "str": str, "dict": dict, "Log": Log}
+    _active_output_format = tuple
+    _KEYS = {"single_instance": ["Name", "Count", "Avg_time", "Avg_exec_times_per_{unit_format}"],
+             "instances": ['Unique_count', 'Count', 'Avg_time', 'Avg_exec_times_per_{unit_format}']}
+
+    @classmethod
+    def _get_keys_from_KEYS(cls, key_option: str) -> Tuple:
+        """Возвращает кортеж с отформатированной последней строкой из _KEYS"""
+
+        keys = cls._KEYS.get(key_option)
+        keys[-1] = keys[-1].format(unit_format=cls.get_time_unit_format())
+
+        return tuple(keys)
 
     @classmethod
     def set_time_unit_format(cls, time_unit: str = 'second') -> None:
@@ -59,7 +59,7 @@ class Statistic:
         return cls._time_units.get(cls.get_time_unit_format())
 
     @classmethod
-    def set_output_format(cls, output_format=tuple) -> None:
+    def set_output_format(cls, output_format: str = "tuple") -> None:
         """Позволяет пользователю установить формат вывода статистических данных.
         Имеет 1 параметр, в который записывается класс необходимых данных.
         Возможные значения: tuple or str or dict"""
@@ -67,47 +67,56 @@ class Statistic:
         cls._active_output_format = cls._output_formats.get(output_format)
 
     @classmethod
-    def get_output_format(cls) -> str:
+    def get_output_format(cls) -> Any:
         """Позволяет пользователю получить формат вывода статистических данных (_active_output_format).
         По умолчанию этот параметр - tuple"""
 
         return cls._active_output_format
 
     @classmethod
-    def _make_keys(cls, instances, keys_for_values=None) -> iter:
-        """Возвращает итератор из значений,
-        которые будут являться ключами при выборе словаря как типа вывода статистических данных """
+    def _convert_instances_to_output_format(cls, *instances, keys_for_values: Optional[Tuple] = None,
+                                            sep="\n", output_format=None) -> Union[Tuple, str, dict]:
+        """Возвращает статистические метрики в выбранном пользователе формате.
+        Вывод определяет переменная _active_output_format (по умолчанию принимает значение tuple)"""
 
-        try:
-            if instances is None:
-                raise TypeError()
+        if output_format is None:
+            output_format = cls.get_output_format()
 
-            keys = (x.func.__name__ for x in instances)
-        except TypeError:
-            if keys_for_values:
-                keys = iter(keys_for_values)
-            else:
-                keys = iter(("Name", "Count", "Average_time", f"Avg_exec_times_per_{cls.get_time_unit_format()}"))
+        if output_format is tuple:
+            output = instances
+        elif output_format is str:
+            output = f"{sep}".join(str(value) for value in instances)
+        elif output_format is dict:
+            if not keys_for_values:
+                keys_for_values = tuple(instance.__name__ for instance in instances)
 
-        return keys
+            output = {keys_for_values[indx]: instance for indx, instance in enumerate(instances)}
+        elif output_format is Log:
+            if not keys_for_values:
+                keys_for_values = cls._get_keys_from_KEYS("instances")
+
+            dct = cls._convert_instances_to_output_format(*instances, output_format=dict,
+                                                          keys_for_values=keys_for_values)
+            output = Log.dict_to_log(dct=dct)
+        else:
+            types = cls._output_formats.keys()
+            raise TypeError(f"Неподдерживаемый тип данных. Доступные типы {', '.join(types)}")
+        return output
 
     @classmethod
-    def _convert_to_output_format(cls, *args, instances=None, sep=", ", keys_for_values=None) -> Union[Tuple, str, dict]:
+    def _get_in_output_format(cls, *values, sep="; ", keys_for_values) -> Union[Tuple, str, dict]:
         """Возвращает статистические метрики в выбранном пользователе формате.
         Вывод определяет переменная _active_output_format (по умолчанию принимает значение tuple)"""
 
         output_format = cls.get_output_format()
 
-        if output_format == "tuple":
-            output = args
-        elif output_format == "str":
-            output = f"{sep}".join(str(value) for value in args)
-        elif output_format == "dict":
-            keys = cls._make_keys(instances, keys_for_values=keys_for_values)
-            output = {next(keys): value for value in args}
+        if output_format is tuple:
+            output = values
+        elif output_format is str:
+            output = f"{sep}".join(str(value) for value in values)
         else:
-            types = cls._output_formats.values()
-            raise TypeError(f"Неподдерживаемый тип данных. Доступные типы {', '.join(types)}")
+            output = {keys_for_values[indx]: value for indx, value in enumerate(values)}
+
         return output
 
     count = StatisticItem()
@@ -180,10 +189,11 @@ class Statistic:
         2) Среднее время работы функции,
         3) Среднее кол-во выполнений функции в единицу времени (дефолт: в секундах)"""
 
-        output = self._convert_to_output_format(self._get_name(),
-                                                self._get_count(),
-                                                self._get_avg_time(),
-                                                self._get_avg_executions_per_unit_time())
+        output = self._get_in_output_format(self._get_name(),
+                                            self._get_count(),
+                                            self._get_avg_time(),
+                                            self._get_avg_executions_per_unit_time(),
+                                            keys_for_values=self._get_keys_from_KEYS("single_instance"))
 
         return output
 
@@ -204,8 +214,10 @@ class Statistic:
             instances = tuple(filter(cls._get_count, cls._instances))
 
         all_instances_metrics = tuple(instance._get_all_metrics() for instance in instances)
-        output = cls._convert_to_output_format(*all_instances_metrics,
-                                               instances=instances, sep="\n") if all_instances_metrics else None
+        keys_for_values = tuple(instance._get_name() for instance in instances)
+
+        output = cls._convert_instances_to_output_format(*all_instances_metrics, keys_for_values=keys_for_values,
+                                                         sep="\n") if all_instances_metrics else None
 
         return output
 
@@ -227,11 +239,12 @@ class Statistic:
             avg_time_all_instances = sum(map(cls._get_avg_time, instances)) / func_amount
             avg_time_per_minute__all_instances = sum(map(cls._get_avg_executions_per_unit_time, instances)) / func_amount
 
-        keys_for_values = ('Unique_count', 'Count', 'Average_time', f'Avg_exec_times_per_{cls.get_time_unit_format()}')
-        output = cls._convert_to_output_format(func_amount,
-                                               count_sum,
-                                               avg_time_all_instances,
-                                               round(avg_time_per_minute__all_instances, 1),
-                                               keys_for_values=keys_for_values)
+        output = cls._get_in_output_format(func_amount,
+                                           count_sum,
+                                           avg_time_all_instances,
+                                           round(avg_time_per_minute__all_instances, 1),
+                                           keys_for_values=cls._get_keys_from_KEYS("instances"))
+
+        output = cls._convert_instances_to_output_format(output, keys_for_values=("General inforamtion",))
 
         return output
