@@ -92,7 +92,7 @@ class Statistic:
         return keys
 
     @classmethod
-    def _convert_to_output_format(cls, *args, instances=None, sep=",", keys_for_values=None) -> Union[Tuple, str, dict]:
+    def _convert_to_output_format(cls, *args, instances=None, sep=", ", keys_for_values=None) -> Union[Tuple, str, dict]:
         """Возвращает статистические метрики в выбранном пользователе формате.
         Вывод определяет переменная _active_output_format (по умолчанию принимает значение tuple)"""
 
@@ -101,7 +101,7 @@ class Statistic:
         if output_format == "tuple":
             output = args
         elif output_format == "str":
-            output = f"{sep} ".join(str(value) for value in args)
+            output = f"{sep}".join(str(value) for value in args)
         elif output_format == "dict":
             keys = cls._make_keys(instances, keys_for_values=keys_for_values)
             output = {next(keys): value for value in args}
@@ -205,7 +205,7 @@ class Statistic:
 
         all_instances_metrics = tuple(instance._get_all_metrics() for instance in instances)
         output = cls._convert_to_output_format(*all_instances_metrics,
-                                               instances=instances, sep=";") if all_instances_metrics else None
+                                               instances=instances, sep="\n") if all_instances_metrics else None
 
         return output
 
