@@ -26,6 +26,9 @@ class Log:
                      for key, value in func_info.items()])
                      for func_info in dct.values()]
 
+        if not instances:
+            instances.append('\tNone')
+
         start = f"[{datetime.datetime.now()}] {instance_class_name} INFO:"
         instances.insert(0, start)
         output = f"{end}".join(instances)

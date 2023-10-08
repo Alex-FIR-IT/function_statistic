@@ -255,8 +255,8 @@ class Statistic:
         all_instances_metrics = tuple(instance._get_all_metrics() for instance in instances)
         keys_for_values = tuple(instance._get_name() for instance in instances)
 
-        output = cls._convert_instances_to_output_format(*all_instances_metrics, keys_for_values=keys_for_values,
-                                                         sep="\n") if all_instances_metrics else None
+        output = cls._convert_instances_to_output_format(*all_instances_metrics,
+                                                         keys_for_values=keys_for_values, sep="\n")
 
         return output
 
