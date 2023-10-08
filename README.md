@@ -1,4 +1,4 @@
-# Библиотека для получения статистики по декорированным функциям
+# Библиотека для получения статистики по декорированным функциям/методам классов
 
 ## Общие положения
 
@@ -15,8 +15,11 @@
 
 - Имя функции;
 - Количество ее вызовов;
-- Среднее время работы функции;
-- Среднее время выполнения функции в единицу времени (дефолт: в секундах).
+- Минимальное время работы функции;
+- Максимальное время работы функции;
+- Последнее время работы функции;
+- Среднее время работы функции (формат по дефолту: секунды);
+- Среднее время выполнения функции в единицу времени (формат по дефолту: секунды).
 
 Библиотека совместима с версией Python 3.8 и выше.
 
@@ -30,8 +33,8 @@
     from function_statistic import Statistic
     
     
-    @Statistic()         # Задекорирован
-    def some_func(a, b): # Какая-то функция
+    @Statistic()         # Декоратор 
+    def some_func(a, b): # Ваша функция
         res = 0
         for i in range(a + b):
             res += i
@@ -44,8 +47,8 @@
         def __init__(self, info):
             self.info = info
     
-        @Statistic()                 # Задекорирован
-        def some_class_method(self): # Какой-то метод класса
+        @Statistic()                 # Декоратор
+        def some_class_method(self): # Ваш метод класса
             return f"{self.info}"
     
     
@@ -58,8 +61,8 @@
     
 > Получение статистики:
 
-    Statistic.set_output_format("Log")
-    Statistic.set_time_unit_format("second")
+    Statistic.set_output_format("Log") # Доступные форматы: ("tuple", "str", "dict", "Log")
+    Statistic.set_time_unit_format("second") # Доступные временные форматы: ("microsecond", "second", "minute", "hour")
 
 
     # Получить метрики для всех декорированных инстансов
@@ -73,13 +76,15 @@
 
 > Вывод:
 
-    [2023-10-08 16:10:18.156704] Statistic INFO:
-        Name: some_func; Count: 50; Min_time: 7.152557373046875e-07; Max_time: 4.5299530029296875e-06; Last_time: 4.5299530029296875e-06; Avg_time: 2.412796020508e-06; Avg_exec_times_per_second: 179858.7
-        Name: some_class_method; Count: 3; Min_time: 0.0; Max_time: 4.76837158203125e-07; Last_time: 0.0; Avg_time: 2.38418579102e-07; Avg_exec_times_per_second: 10951.2
-    [2023-10-08 16:10:18.156771] Statistic INFO:
-        some_class_method: {'Name': 'some_class_method', 'Count': 3, 'Min_time': 0.0, 'Max_time': 4.76837158203125e-07, 'Last_time': 0.0, 'Avg_time': 2.38418579102e-07, 'Avg_exec_times_per_second': 10951.2}
-    [2023-10-08 16:10:18.156810] Statistic INFO:
-        General inforamtion: {'Unique_count': 2, 'Count': 53, 'Avg_time': 1.325607299805e-06, 'Avg_exec_times_per_second': 95405.0}
+    [2023-10-08 16:22:42.765913] Statistic INFO:
+        Name: some_func; Count: 50; Min_time: 4.76837158203125e-07; Max_time: 4.5299530029296875e-06; Last_time: 4.5299530029296875e-06; Avg_time: 2.231597900391e-06; Avg_exec_times_per_second: 190823.7
+        Name: some_class_method; Count: 3; Min_time: 2.384185791015625e-07; Max_time: 4.76837158203125e-07; Last_time: 2.384185791015625e-07; Avg_time: 3.17891438802e-07; Avg_exec_times_per_second: 11683.3
+    
+    [2023-10-08 16:22:42.765973] Statistic INFO:
+        Name: some_class_method; Count: 3; Min_time: 2.384185791015625e-07; Max_time: 4.76837158203125e-07; Last_time: 2.384185791015625e-07; Avg_time: 3.17891438802e-07; Avg_exec_times_per_second: 11683.3
+    
+    [2023-10-08 16:22:42.766008] Statistic INFO:
+        Unique_count: 2; Count: 53; Avg_time: 1.2747446695965e-06; Avg_exec_times_per_second: 101253.5
 
 ### Доступные форматы для вывода
 
@@ -87,72 +92,83 @@
 
 - tuple;
 - str;
-- dict.
+- dict;
+- Log.
  
-### Доступные временные единицы измерения:
+### Доступные временные форматы:
 
-- Microsecond (коэфициент - 10^6);
-- Second (коэфициент - 1);
-- Minute (коэфициент 1/60);
-- Hour (коэфициент 1/3600).
+- microsecond (коэфициент - 10^6);
+- second (коэфициент - 1);
+- minute (коэфициент 1/60);
+- hour (коэфициент 1/3600).
 
 ### Методы 
 
 - #### *classmethod* Statistic.set_time_unit_format(cls, time_unit: str = 'second') -> None 
 Позволяет установить временную единицу, которая используется при выводе 
-статистических метрик в таких методах, как:
-1) get_avg_time
-2) get_avg_executions_per_unit_time
-3) get_all_metrics
-4) get_all_instances_metrics
-5) get_average_instances_metrics
+статистических метрик.
 
-Возможные значения: 'microsecond' or 'second' or 'minute' or 'hour'
+Доступные временные форматы: 'microsecond', 'second', 'minute', 'hour'
+
+Пример использования:
+
+    Statistic.set_time_unit_format("second")
+    Statistic.set_time_unit_format(time_unit="second")
+
 - #### *classmethod* Statistic.get_time_unit_format(cls) -> str
 Позволяет получить временною единицу, в которою переводятся все статистические метрики
-(по умолчанию принимает значение - second)
+(геттор метода set_time_unit_format). По умолчанию параметр принимает значение 'second'.
 
-- #### *classmethod* Statistic.set_output_format(cls, output_format=tuple) -> None
+Пример использования:
+
+    Statistic.get_time_unit_format()
+    # Output: second
+
+- #### *classmethod* Statistic.set_output_format(cls, output_format: str = 'tuple') -> None
 Позволяет пользователю установить формат вывода статистических данных.
-Имеет 1 параметр, в который записывается класс необходимых данных.
+Имеет 1 параметр - output_format принимающий строку соответствующую доступному типу данных.
 
-Возможные значения: tuple or str or dict.
+Доступные форматы: 'tuple', 'str', 'dict', 'Log'.
+
+Пример использования:
+
+    Statistic.set_output_format('tuple')
+    Statistic.set_output_format(output_format='tuple')    
 
 - #### *classmethod* Statistic.get_output_format(cls) -> str
-Позволяет пользователю получить формат вывода статистических данных (_active_output_format).
-По умолчанию этот параметр - tuple.
+Позволяет пользователю получить формат вывода статистических данных (геттор метода set_output_format).
+По умолчанию, если не вызывался метод set_output_format, принимает значение 'tuple'.
 
-- #### instance._get_name(self) -> str
-Возвращает имя функции.
+Пример использования:
 
-- #### instance._get_count(self) -> int
-Возвращает количество вызовов функции.
-
-- #### instance._get_avg_time(self) -> Optional[float]
-Возвращает среднее время выполнения функции (по умолчанию в секундах).
-
-- #### instance._get_avg_executions_per_unit_time(self) -> Optional[float]
-Возвращает среднее количество выполнений функции в единицу времени (дефолт: в секунду)
-
-- #### instance._get_all_metrics(self) -> Union[Tuple[str, int, Optional[float], Optional[float]], str, dict]
-Возвращает кортеж, содержащий следующие параметры:
-1) Имя функции;
-2) Кол-во вызовов функции;
-3) Среднее время работы функции;
-4) Среднее кол-во выполнений функции в единицу времени (дефолт: в секундах).
+    Statistic.get_output_format()
+    # Output: tuple
 
 - #### *classmethod* Statistic.get_instances_metrics(cls, instances_names: tuple = ()) -> Optional[Tuple]
-Принимает кортеж, состоящий из имен декорированных функций.
-Возвращает для переданных декорированных функций\методов в выбранном пользователем формате (по умолчанию tuple)
-слудующие данные (по умолчанию возвращает информацию по все инстансам):
-1) Имя функции,
-2) Кол-во вызовов функции,
-3) Среднее время работы функции,
-4) Среднее кол-во выполнений функции в единицу времени (дефолт: в секундах)
+По умолчанию возвращает статистическую информацию по всем отдельным инстансам. 
+Метод имеет 1 параметр instances_names (по умолчанию пустой кортеж), принимающий имена инстансов. 
+Если в instances_names передан непустой кортеж, то возвращает статистическую информацию по переданым инстансам. 
+Если в instances_names передан непустой кортеж, где все его значения принимают значения несущетсвующих инстансов, то
+возвращает ложное с точки зрения Python выражение (кроме тех случаев, когда формат вывода принимает значение - 'Log')
+
+Пример использования:
+    
+    Statistic.set_output_format(output_format='dict')
+    Statistic.get_instances_metrics()
+    # Output: {'some_func': {'Name': 'some_func', 'Count': 50, 'Min_time': 4.76837158203125e-07, 'Max_time': 6.198883056640625e-06, 'Last_time': 5.0067901611328125e-06, 'Avg_time': 2.865791320801e-06, 'Avg_exec_times_per_second': 152409.3}, 
+    #          'some_class_method': {'Name': 'some_class_method', 'Count': 3, 'Min_time': 2.384185791015625e-07, 'Max_time': 4.76837158203125e-07, 'Last_time': 2.384185791015625e-07, 'Avg_time': 3.17891438802e-07, 'Avg_exec_times_per_second': 9327.6}}
+
+    Statistic.get_instances_metrics(("some_func",))
+    # Output: {'some_func': {'Name': 'some_func', 'Count': 50, 'Min_time': 4.76837158203125e-07, 'Max_time': 4.76837158203125e-06, 'Last_time': 4.76837158203125e-06, 'Avg_time': 2.460479736328e-06, 'Avg_exec_times_per_second': 168445.9}}
+
+    Statistic.get_instances_metrics(("does_not_exist",))
+    # Output: {}
 
 - #### *classmethod* Statistic.get_average_instances_metrics(cls) -> Union[Tuple[int, int, Optional[float], Optional[float]], str, dict]:
-Возвращает среднюю статистику по всем функциям, а именно:
-1) Общее количество вызванных уникальных функций;
-2) Общее количество вызовов функций;
-3) Среднее время работы всех функций;
-4) Среднее время кол-во выполнений всех функций в единицу времени (дефолт: в секунду).
+Возвращает обобщенную статистику по всем инстансам.
+
+Пример использования:
+
+    Statistic.set_output_format(output_format='dict')
+    Statistic.get_average_instances_metrics()
+    # Output: {'General inforamtion': {'Unique_count': 2, 'Count': 53, 'Avg_time': 1.348654429118e-06, 'Avg_exec_times_per_second': 94493.6}}
