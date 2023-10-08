@@ -132,7 +132,7 @@ class Statistic:
         return instance
 
     def __init__(self):
-        self.count = self.avg_time = self.total_time = 0
+        self.count = self.min_time = self.max_time = self.avg_time = self.total_time = 0
         self.work_start = time()
         self.work_finish = None
 
@@ -146,12 +146,28 @@ class Statistic:
             work_start = time()
             func_res = func(*args, **kwargs)
             self.work_finish = time()
-            self.total_time += (self.work_finish - work_start)
+
+            work_time = self.work_finish - work_start
+            self.total_time += work_time
+            self._set_min_time(work_time)
+            self._set_max_time(work_time)
 
             self.avg_time = self.total_time / self.count
             return func_res
 
         return wrapper
+
+    def _set_min_time(self, work_time: float) -> None:
+        """Если переданное значение work_time меньше, чем self.min_time, то тогда изменяется значение self.min_time"""
+
+        if work_time < self.min_time:
+            self.min_time = work_time
+
+    def _set_max_time(self, work_time: float) -> None:
+        """Если переданное значение work_time больше, чем max_time, то тогда изменяется значение self.max_time"""
+
+        if work_time > self.max_time:
+            self.max_time = work_time
 
     def _get_name(self) -> str:
         """Возвращает имя функции"""
@@ -162,6 +178,16 @@ class Statistic:
         """Возвращает кол-во вызовов функции"""
 
         return self.count
+
+    def _get_min_time(self) -> float:
+        """Возвращает минимальное время работы функции"""
+
+        return self.min_time
+
+    def _get_max_time(self) -> float:
+        """Возвращает максимальное время работы функции"""
+
+        return self.max_time
 
     def _get_avg_time(self) -> Optional[float]:
         """Возвращает среднее время выполнения функции (дефолт: в секундах)"""
