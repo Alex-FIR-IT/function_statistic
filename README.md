@@ -22,6 +22,65 @@
 
 ## Документация
 
+
+### Быстрый старт
+
+> Ваша программа:
+
+    from function_statistic import Statistic
+    
+    
+    @Statistic()         # Задекорирован
+    def some_func(a, b): # Какая-то функция
+        res = 0
+        for i in range(a + b):
+            res += i
+    
+        return res
+    
+    
+    class SomeClass:
+    
+        def __init__(self, info):
+            self.info = info
+    
+        @Statistic()                 # Задекорирован
+        def some_class_method(self): # Какой-то метод класса
+            return f"{self.info}"
+    
+    
+    for i in range(50):
+        some_func(i, i)
+    
+    test = SomeClass("some information")
+    for i in range(3):
+        test.some_class_method()
+    
+> Получение статистики:
+
+    Statistic.set_output_format("Log")
+    Statistic.set_time_unit_format("second")
+
+
+    # Получить метрики для всех декорированных инстансов
+    Statistic.get_instances_metrics()
+    
+    # Получить метрики для указанных декорированных инстансов
+    Statistic.get_instances_metrics(("some_class_method",))
+    
+    # Получить обобщенную статистику по всем инстансам
+    Statistic.get_average_instances_metrics()
+
+> Вывод:
+
+    [2023-10-08 16:10:18.156704] Statistic INFO:
+        Name: some_func; Count: 50; Min_time: 7.152557373046875e-07; Max_time: 4.5299530029296875e-06; Last_time: 4.5299530029296875e-06; Avg_time: 2.412796020508e-06; Avg_exec_times_per_second: 179858.7
+        Name: some_class_method; Count: 3; Min_time: 0.0; Max_time: 4.76837158203125e-07; Last_time: 0.0; Avg_time: 2.38418579102e-07; Avg_exec_times_per_second: 10951.2
+    [2023-10-08 16:10:18.156771] Statistic INFO:
+        some_class_method: {'Name': 'some_class_method', 'Count': 3, 'Min_time': 0.0, 'Max_time': 4.76837158203125e-07, 'Last_time': 0.0, 'Avg_time': 2.38418579102e-07, 'Avg_exec_times_per_second': 10951.2}
+    [2023-10-08 16:10:18.156810] Statistic INFO:
+        General inforamtion: {'Unique_count': 2, 'Count': 53, 'Avg_time': 1.325607299805e-06, 'Avg_exec_times_per_second': 95405.0}
+
 ### Доступные форматы для вывода
 
 Декоратор Statistic имеет методы, позволяющие получить статистику по функциям в следующих форматах:
