@@ -9,7 +9,7 @@ from additional import StatisticItem, Log
 class Statistic:
 
     _instances = []
-    _time_units = {"microsecond": 1_000_000, "second": 1, "minute":  1/60, "hour": 1/3600}
+    _time_units = {"microsecond": 1_000_000, "second": 1, "minute": (1/60), "hour": (1/3600)}
     _active_time_unit = "second"
     _output_formats = {"tuple": tuple, "str": str, "dict": dict, "Log": Log}
     _active_output_format = tuple
@@ -132,9 +132,9 @@ class Statistic:
         return instance
 
     def __init__(self):
-        self.count = self.min_time = self.max_time = self.avg_time = self.total_time = 0
+        self.count = self.max_time = self.avg_time = self.total_time = 0
         self.work_start = time()
-        self.work_finish = None
+        self.work_finish = self.min_time = None
 
     def __call__(self, func):
         self.func = func
@@ -160,7 +160,10 @@ class Statistic:
     def _set_min_time(self, work_time: float) -> None:
         """Если переданное значение work_time меньше, чем self.min_time, то тогда изменяется значение self.min_time"""
 
-        if work_time < self.min_time:
+        try:
+            if work_time < self.min_time:
+                self.min_time = work_time
+        except TypeError:
             self.min_time = work_time
 
     def _set_max_time(self, work_time: float) -> None:
