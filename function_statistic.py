@@ -277,11 +277,12 @@ class Statistic:
         if func_amount:
             avg_time_all_instances = sum(map(cls._get_avg_time, instances)) / func_amount
             avg_time_per_minute__all_instances = sum(map(cls._get_avg_executions_per_unit_time, instances)) / func_amount
+            avg_time_per_minute__all_instances = round(avg_time_per_minute__all_instances, 1)
 
         output = cls._get_in_output_format(func_amount,
                                            count_sum,
                                            avg_time_all_instances,
-                                           round(avg_time_per_minute__all_instances, 1),
+                                           avg_time_per_minute__all_instances,
                                            keys_for_values=cls._get_keys_from_KEYS("instances"))
 
         output = cls._convert_instances_to_output_format(output, keys_for_values=("General inforamtion",))
