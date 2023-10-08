@@ -13,7 +13,7 @@ class Statistic:
     _active_time_unit = "second"
     _output_formats = {"tuple": tuple, "str": str, "dict": dict, "Log": Log}
     _active_output_format = tuple
-    _KEYS = {"single_instance": ["Name", "Count", "Avg_time", "Avg_exec_times_per_{unit_format}"],
+    _KEYS = {"single_instance": ["Name", "Count", "Min_time", "Max_time", "Avg_time", "Avg_exec_times_per_{unit_format}"],
              "instances": ['Unique_count', 'Count', 'Avg_time', 'Avg_exec_times_per_{unit_format}']}
 
     @classmethod
@@ -211,11 +211,15 @@ class Statistic:
         """Возвращает кортеж, содержащий:
         0) Имя функции,
         1) Кол-во вызовов функции,
+        2) Минимальное время работы функции,
+        3) Максимальное время работы функции,
         2) Среднее время работы функции,
         3) Среднее кол-во выполнений функции в единицу времени (дефолт: в секундах)"""
 
         output = self._get_in_output_format(self._get_name(),
                                             self._get_count(),
+                                            self._get_min_time(),
+                                            self._get_max_time(),
                                             self._get_avg_time(),
                                             self._get_avg_executions_per_unit_time(),
                                             keys_for_values=self._get_keys_from_KEYS("single_instance"))
