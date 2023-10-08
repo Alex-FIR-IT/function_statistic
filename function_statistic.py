@@ -13,7 +13,7 @@ class Statistic:
     _active_time_unit = "second"
     _output_formats = {"tuple": tuple, "str": str, "dict": dict, "Log": Log}
     _active_output_format = tuple
-    _KEYS = {"single_instance": ["Name", "Count", "Min_time", "Max_time", "Avg_time", "Avg_exec_times_per_{unit_format}"],
+    _KEYS = {"single_instance": ["Name", "Count", "Min_time", "Max_time", "Last_time", "Avg_time", "Avg_exec_times_per_{unit_format}"],
              "instances": ['Unique_count', 'Count', 'Avg_time', 'Avg_exec_times_per_{unit_format}']}
 
     @classmethod
@@ -134,7 +134,7 @@ class Statistic:
     def __init__(self):
         self.count = self.max_time = self.avg_time = self.total_time = 0
         self.work_start = time()
-        self.work_finish = self.min_time = None
+        self.work_finish = self.min_time = self.last_time = None
 
     def __call__(self, func):
         self.func = func
@@ -147,10 +147,10 @@ class Statistic:
             func_res = func(*args, **kwargs)
             self.work_finish = time()
 
-            work_time = self.work_finish - work_start
-            self.total_time += work_time
-            self._set_min_time(work_time)
-            self._set_max_time(work_time)
+            self.last_time = self.work_finish - work_start
+            self.total_time += self.last_time
+            self._set_min_time(self.last_time)
+            self._set_max_time(self.last_time)
 
             self.avg_time = self.total_time / self.count
             return func_res
@@ -171,6 +171,11 @@ class Statistic:
 
         if work_time > self.max_time:
             self.max_time = work_time
+
+    def _get_last_time(self) -> float:
+        """Возвращает последнее время, за которое выполнилась функция"""
+
+        return self.last_time
 
     def _get_name(self) -> str:
         """Возвращает имя функции"""
@@ -216,6 +221,7 @@ class Statistic:
         1) Кол-во вызовов функции,
         2) Минимальное время работы функции,
         3) Максимальное время работы функции,
+        4) Послденее время работы функции,
         2) Среднее время работы функции,
         3) Среднее кол-во выполнений функции в единицу времени (дефолт: в секундах)"""
 
@@ -223,6 +229,7 @@ class Statistic:
                                             self._get_count(),
                                             self._get_min_time(),
                                             self._get_max_time(),
+                                            self._get_last_time(),
                                             self._get_avg_time(),
                                             self._get_avg_executions_per_unit_time(),
                                             keys_for_values=self._get_keys_from_KEYS("single_instance"))
