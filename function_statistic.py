@@ -20,9 +20,8 @@ class Statistic:
     def _get_keys_from_KEYS(cls, key_option: str) -> Tuple:
         """Возвращает кортеж с отформатированной последней строкой из _KEYS"""
 
-        keys = cls._KEYS.get(key_option)
+        keys = cls._KEYS.get(key_option).copy()
         keys[-1] = keys[-1].format(unit_format=cls.get_time_unit_format())
-
         return tuple(keys)
 
     @classmethod
@@ -147,7 +146,7 @@ class Statistic:
             work_start = time()
             func_res = func(*args, **kwargs)
             self.work_finish = time()
-            self.total_time += self.work_finish - work_start
+            self.total_time += (self.work_finish - work_start)
 
             self.avg_time = self.total_time / self.count
             return func_res
