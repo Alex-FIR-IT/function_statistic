@@ -22,9 +22,6 @@ class Log:
     def dict_to_log(dct: dict, instance_class_name: str = "Statistic", sep: str = "; ", end: str = "\n") -> str:
         """Возвращает строку в формате Log"""
 
-        if len(dct) == 1:
-            dct = {1: dct}
-
         instances = ["\t" + f"{sep}".join([f"{key}: {value}"
                      for key, value in func_info.items()])
                      for func_info in dct.values()]
