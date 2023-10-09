@@ -1,5 +1,5 @@
 from time import time
-from typing import Union, Tuple, Optional, Any
+from typing import Union, Tuple, List, Optional, Any
 from functools import wraps
 from additional import StatisticItem, Log
 
@@ -92,14 +92,18 @@ class Statistic:
         return output
 
     @classmethod
-    def _convert_to_dict(cls, *instances, keys_for_values=None):
+    def _convert_to_dict(cls, *instances, keys_for_values: Optional[List] = None) -> dict:
+        """Создает и возвращает словарь"""
+
         if not keys_for_values:
             keys_for_values = tuple(instance.__name__ for instance in instances)
 
         return {keys_for_values[indx]: instance for indx, instance in enumerate(instances)}
 
     @classmethod
-    def _convert_to_Log_format(cls, *instances, keys_for_values=None):
+    def _convert_to_Log_format(cls, *instances, keys_for_values: Optional[List] = None) -> str:
+        """Создает и возвращает строку в формате 'Log'"""
+
         if not keys_for_values:
             keys_for_values = cls._get_keys_from_KEYS("instances")
 
