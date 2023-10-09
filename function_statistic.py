@@ -73,8 +73,8 @@ class Statistic:
         return cls._active_output_format
 
     @classmethod
-    def _convert_instances_to_output_format(cls, *instances, keys_for_values: Optional[Tuple] = None,
-                                            sep="\n", output_format=None) -> Union[Tuple, str, dict]:
+    def _convert_to_output_format(cls, *instances, keys_for_values: Optional[Tuple] = None,
+                                  sep="\n", output_format=None, for_print=True) -> Union[Tuple, str, dict]:
         """Возвращает статистические метрики в выбранном пользователе формате.
         Вывод определяет переменная _active_output_format (по умолчанию принимает значение tuple)"""
 
@@ -85,38 +85,26 @@ class Statistic:
             output = instances
         elif output_format is str:
             output = f"{sep}".join(str(value) for value in instances)
-        elif output_format is dict:
-            if not keys_for_values:
-                keys_for_values = tuple(instance.__name__ for instance in instances)
-
-            output = {keys_for_values[indx]: instance for indx, instance in enumerate(instances)}
-        elif output_format is Log:
-            if not keys_for_values:
-                keys_for_values = cls._get_keys_from_KEYS("instances")
-
-            dct = cls._convert_instances_to_output_format(*instances, output_format=dict,
-                                                          keys_for_values=keys_for_values)
-            output = Log.dict_to_log(dct=dct)
+        elif output_format is Log and for_print:
+            output = cls._convert_to_Log_format(*instances, keys_for_values=keys_for_values)
         else:
-            types = cls._output_formats.keys()
-            raise TypeError(f"Неподдерживаемый тип данных. Доступные типы {', '.join(types)}")
+            output = cls._convert_to_dict(keys_for_values=keys_for_values, *instances)
         return output
 
     @classmethod
-    def _get_in_output_format(cls, *values, sep="; ", keys_for_values) -> Union[Tuple, str, dict]:
-        """Возвращает статистические метрики форматах: str, tuple, иначе dict.
-        Вывод определяет переменная _active_output_format (по умолчанию принимает значение tuple)"""
+    def _convert_to_dict(cls, *instances, keys_for_values=None):
+        if not keys_for_values:
+            keys_for_values = tuple(instance.__name__ for instance in instances)
 
-        output_format = cls.get_output_format()
+        return {keys_for_values[indx]: instance for indx, instance in enumerate(instances)}
 
-        if output_format is tuple:
-            output = values
-        elif output_format is str:
-            output = f"{sep}".join(str(value) for value in values)
-        else:
-            output = {keys_for_values[indx]: value for indx, value in enumerate(values)}
+    @classmethod
+    def _convert_to_Log_format(cls, *instances, keys_for_values=None):
+        if not keys_for_values:
+            keys_for_values = cls._get_keys_from_KEYS("instances")
 
-        return output
+        dct = cls._convert_to_output_format(*instances, output_format=dict, keys_for_values=keys_for_values)
+        return Log.dict_to_log(dct=dct)
 
     count = StatisticItem()
     func = StatisticItem()
@@ -225,14 +213,15 @@ class Statistic:
         5) Среднее время работы функции,
         6) Среднее кол-во выполнений функции в единицу времени (дефолт: в секундах)"""
 
-        output = self._get_in_output_format(self._get_name(),
-                                            self._get_count(),
-                                            self._get_min_time(),
-                                            self._get_max_time(),
-                                            self._get_last_time(),
-                                            self._get_avg_time(),
-                                            self._get_avg_executions_per_unit_time(),
-                                            keys_for_values=self._get_keys_from_KEYS("single_instance"))
+        output = self._convert_to_output_format(self._get_name(),
+                                                self._get_count(),
+                                                self._get_min_time(),
+                                                self._get_max_time(),
+                                                self._get_last_time(),
+                                                self._get_avg_time(),
+                                                self._get_avg_executions_per_unit_time(),
+                                                keys_for_values=self._get_keys_from_KEYS("single_instance"),
+                                                sep="; ", for_print=False)
 
         return output
 
@@ -250,8 +239,8 @@ class Statistic:
         all_instances_metrics = tuple(instance._get_all_metrics() for instance in instances)
         keys_for_values = tuple(instance._get_name() for instance in instances)
 
-        output = cls._convert_instances_to_output_format(*all_instances_metrics,
-                                                         keys_for_values=keys_for_values, sep="\n")
+        output = cls._convert_to_output_format(*all_instances_metrics,
+                                               keys_for_values=keys_for_values, sep="\n")
 
         return output
 
@@ -274,12 +263,13 @@ class Statistic:
             avg_time_per_minute__all_instances = sum(map(cls._get_avg_executions_per_unit_time, instances)) / func_amount
             avg_time_per_minute__all_instances = round(avg_time_per_minute__all_instances, 1)
 
-        output = cls._get_in_output_format(func_amount,
-                                           count_sum,
-                                           avg_time_all_instances,
-                                           avg_time_per_minute__all_instances,
-                                           keys_for_values=cls._get_keys_from_KEYS("instances"))
+        output = cls._convert_to_output_format(func_amount,
+                                               count_sum,
+                                               avg_time_all_instances,
+                                               avg_time_per_minute__all_instances,
+                                               keys_for_values=cls._get_keys_from_KEYS("instances"),
+                                               sep="; ", for_print=False)
 
-        output = cls._convert_instances_to_output_format(output, keys_for_values=("General inforamtion",))
+        output = cls._convert_to_output_format(output, keys_for_values=("General inforamtion",), sep="; ")
 
         return output
