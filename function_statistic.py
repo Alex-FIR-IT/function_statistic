@@ -209,7 +209,7 @@ class Statistic:
             return round(self.count / ((self.work_finish - self.work_start) * time_format), 1)
 
     def _get_all_metrics(self) -> Union[Tuple[str, int, Optional[float], Optional[float]], str, dict]:
-        """Возвращает кортеж, содержащий:
+        """Возвращает кортеж, содержащий статистические метрики инстанса:
         0) Имя функции,
         1) Кол-во вызовов функции,
         2) Минимальное время работы функции,
