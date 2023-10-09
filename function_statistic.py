@@ -39,15 +39,15 @@ class Statistic:
         return cls._active_time_unit
 
     @classmethod
-    def _is_in_permitted_values(cls, time_unit: str, permitted_value: dict) -> str:
+    def _is_in_permitted_values(cls, value: str, permitted_value: dict) -> str:
         """Проверяет, что значение time_unit находится в permitted_value. Используется в set_time_unit_format"""
 
-        if time_unit not in permitted_value:
-            message = f"Введенного вами формата не существует, " \
-                      f"доступные форматы: {', '.join(x for x in cls._time_units.keys())}"
+        if value not in permitted_value:
+            message = f"Введенной опции не существует. " \
+                      f"Доступные опции: {', '.join(x for x in permitted_value)}"
             raise KeyError(message)
 
-        return time_unit
+        return value
 
     @classmethod
     def _get_time_unit_value(cls) -> Union[int, float]:
@@ -63,6 +63,7 @@ class Statistic:
         Имеет 1 параметр - output_format принимающий строку соответствующую доступному типу данных.
         Доступные форматы: 'tuple', 'str', 'dict', 'Log'"""
 
+        cls._is_in_permitted_values(output_format, cls._output_formats)
         cls._active_output_format = cls._output_formats.get(output_format)
 
     @classmethod
