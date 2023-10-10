@@ -30,24 +30,26 @@ class Statistic:
             raise AttributeError(f"Класс {cls.__name__} не поддерживает создание экземпляров")
 
         @classmethod
-        def dict_to_log(cls, dct: dict, instance_class_name: str = "Statistic", sep: str = "; ", end: str = "\n") -> str:
+        def dict_to_log(cls, dct: dict, instance_class_name: str = "Statistic",
+                        sep: str = "; ", end: str = "\n", tab: str = "\t") -> str:
             """Возвращает строку в формате Log"""
 
-            instances = ["\t" + f"{sep}".join([f"{key}: {value}"
-                                               for key, value in func_info.items()])
+            instances = [tab + f"{sep}".join([f"{key}: {value}"
+                         for key, value in func_info.items()])
                          for func_info in dct.values()]
 
-            first_log_row = cls._get_first_log_row(instances=instances, instance_class_name=instance_class_name)
+            if not instances:
+                instances.append(f'{tab}None')
+
+            first_log_row = cls._get_first_log_row(instance_class_name=instance_class_name)
             instances.insert(0, first_log_row)
             output = f"{end}".join(instances)
 
             return output
 
         @classmethod
-        def _get_first_log_row(cls, instances: List, instance_class_name: str) -> str:
+        def _get_first_log_row(cls, instance_class_name: str) -> str:
             """Возвращает 1 строку для логов в зависимости от переменной класса datetime_present"""
-            if not instances:
-                instances.append('\tNone')
 
             if cls.datetime_present:
                 first_log_row = f"[{datetime.datetime.now()}] {instance_class_name} INFO:"
