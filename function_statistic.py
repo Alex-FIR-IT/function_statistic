@@ -275,6 +275,6 @@ class Statistic:
                                                keys_for_values=cls._get_keys_from_KEYS("instances"),
                                                sep="; ", for_print=False)
 
-        output = cls._convert_to_output_format(output, keys_for_values=("General inforamtion",), sep="; ")
+        output = cls._convert_to_output_format(output, keys_for_values=("General information",), sep="; ")
 
         return output
