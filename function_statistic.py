@@ -1,3 +1,4 @@
+import datetime
 from time import time
 from typing import Union, Tuple, List, Optional, Any
 from functools import wraps
@@ -18,30 +19,42 @@ class StatisticItem:
         setattr(instance, self.__name, value)
 
 
-class Log:
-
-    def __new__(cls, *args, **kwargs):
-        raise AttributeError(f"Класс {cls.__name__} не поддерживает создание экземпляров")
-
-    @staticmethod
-    def dict_to_log(dct: dict, instance_class_name: str = "Statistic", sep: str = "; ", end: str = "\n") -> str:
-        """Возвращает строку в формате Log"""
-
-        instances = ["\t" + f"{sep}".join([f"{key}: {value}"
-                     for key, value in func_info.items()])
-                     for func_info in dct.values()]
-
-        if not instances:
-            instances.append('\tNone')
-
-        start = f"{instance_class_name}:"
-        instances.insert(0, start)
-        output = f"{end}".join(instances)
-
-        return output
-
-
 class Statistic:
+
+    class Log:
+        """Класс для представления output информации в формате Log"""
+
+        datetime_present = False
+
+        def __new__(cls, *args, **kwargs):
+            raise AttributeError(f"Класс {cls.__name__} не поддерживает создание экземпляров")
+
+        @classmethod
+        def dict_to_log(cls, dct: dict, instance_class_name: str = "Statistic", sep: str = "; ", end: str = "\n") -> str:
+            """Возвращает строку в формате Log"""
+
+            instances = ["\t" + f"{sep}".join([f"{key}: {value}"
+                                               for key, value in func_info.items()])
+                         for func_info in dct.values()]
+
+            first_log_row = cls._get_first_log_row(instances=instances, instance_class_name=instance_class_name)
+            instances.insert(0, first_log_row)
+            output = f"{end}".join(instances)
+
+            return output
+
+        @classmethod
+        def _get_first_log_row(cls, instances: List, instance_class_name: str) -> str:
+            """Возвращает 1 строку для логов в зависимости от переменной класса datetime_present"""
+            if not instances:
+                instances.append('\tNone')
+
+            if cls.datetime_present:
+                first_log_row = f"[{datetime.datetime.now()}] {instance_class_name} INFO:"
+            else:
+                first_log_row = f'{instance_class_name}'
+
+            return first_log_row
 
     _instances = []
     _time_units = {"microsecond": 1_000_000, "second": 1, "minute": (1/60), "hour": (1/3600)}
@@ -121,7 +134,7 @@ class Statistic:
             output = instances
         elif output_format is str:
             output = f"{sep}".join(str(value) for value in instances)
-        elif output_format is Log and for_print:
+        elif output_format is cls.Log and for_print:
             output = cls._convert_to_Log_format(*instances, keys_for_values=keys_for_values)
         else:
             output = cls._convert_to_dict(keys_for_values=keys_for_values, *instances)
@@ -144,7 +157,7 @@ class Statistic:
             keys_for_values = cls._get_keys_from_KEYS("instances")
 
         dct = cls._convert_to_output_format(*instances, output_format=dict, keys_for_values=keys_for_values)
-        return Log.dict_to_log(dct=dct)
+        return cls.Log.dict_to_log(dct=dct)
 
     count = StatisticItem()
     func = StatisticItem()
