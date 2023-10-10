@@ -172,3 +172,37 @@
     Statistic.set_output_format(output_format='dict')
     Statistic.get_average_instances_metrics()
     # Output: {'General inforamtion': {'Unique_count': 2, 'Count': 53, 'Avg_time': 1.348654429118e-06, 'Avg_exec_times_per_second': 94493.6}}
+
+
+### Класс Log
+Класс "Log" необходим для формирования выходной информации в соответствующем формате.
+
+- #### Statistic.Log.datetime_present: bool
+Атрибут datetime_present определяет формат вывода 1 строки логов. Существуют 2 формата первой строчки:
+1) Без указания времени в 1 строчке - False (по умолчанию);
+2) С указанием времени в 1 строчке - True.
+
+Пример 1:
+
+    Statistic.set_output_format("Log")
+    Statistic.set_time_unit_format("second")
+    Statistic.get_instances_metrics()
+
+Output: 
+
+    Statistic
+	    Name: some_func; Count: 50; Min_time: 9.5367431640625e-07; Max_time: 8.821487426757812e-06; Last_time: 8.821487426757812e-06; Avg_time: 4.377365112305e-06; Avg_exec_times_per_second: 104387.9
+	    Name: some_class_method; Count: 3; Min_time: 2.384185791015625e-07; Max_time: 7.152557373046875e-07; Last_time: 2.384185791015625e-07; Avg_time: 3.97364298503e-07; Avg_exec_times_per_second: 75800.7
+
+Пример 2:
+    
+    Statistic.Log.datetime_present = True
+    Statistic.set_output_format("Log")
+    Statistic.set_time_unit_format("second")
+    Statistic.get_time_unit_format()
+    
+Output:
+
+    [2023-10-10 20:14:50.547998] Statistic INFO:
+	    Name: some_func; Count: 50; Min_time: 7.152557373046875e-07; Max_time: 5.0067901611328125e-06; Last_time: 5.0067901611328125e-06; Avg_time: 2.684593200684e-06; Avg_exec_times_per_second: 174908.4
+	    Name: some_class_method; Count: 3; Min_time: 2.384185791015625e-07; Max_time: 4.76837158203125e-07; Last_time: 2.384185791015625e-07; Avg_time: 3.17891438802e-07; Avg_exec_times_per_second: 99864.4
