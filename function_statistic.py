@@ -1,4 +1,3 @@
-import datetime
 from time import time
 from typing import Union, Tuple, List, Optional, Any
 from functools import wraps
@@ -35,7 +34,7 @@ class Log:
         if not instances:
             instances.append('\tNone')
 
-        start = f"[{datetime.datetime.now()}] {instance_class_name} INFO:"
+        start = f"{instance_class_name}:"
         instances.insert(0, start)
         output = f"{end}".join(instances)
 
