@@ -76,14 +76,14 @@
 
 > Вывод:
 
-    [2023-10-08 16:22:42.765913] Statistic INFO:
+    Statistic:
         Name: some_func; Count: 50; Min_time: 4.76837158203125e-07; Max_time: 4.5299530029296875e-06; Last_time: 4.5299530029296875e-06; Avg_time: 2.231597900391e-06; Avg_exec_times_per_second: 190823.7
         Name: some_class_method; Count: 3; Min_time: 2.384185791015625e-07; Max_time: 4.76837158203125e-07; Last_time: 2.384185791015625e-07; Avg_time: 3.17891438802e-07; Avg_exec_times_per_second: 11683.3
     
-    [2023-10-08 16:22:42.765973] Statistic INFO:
+    Statistic:
         Name: some_class_method; Count: 3; Min_time: 2.384185791015625e-07; Max_time: 4.76837158203125e-07; Last_time: 2.384185791015625e-07; Avg_time: 3.17891438802e-07; Avg_exec_times_per_second: 11683.3
     
-    [2023-10-08 16:22:42.766008] Statistic INFO:
+    Statistic:
         Unique_count: 2; Count: 53; Avg_time: 1.2747446695965e-06; Avg_exec_times_per_second: 101253.5
 
 ### Доступные форматы для вывода
